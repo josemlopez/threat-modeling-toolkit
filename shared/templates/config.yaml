@@ -1,0 +1,223 @@
+# Threat Model Configuration
+# Copy this file to .threatmodel/config.yaml and customize
+
+# Project Information
+project:
+  name: "My Application"
+  version: "1.0.0"
+  description: "Brief description of the system"
+  owner: "security-team"
+
+# Analysis Settings
+analysis:
+  # Threat framework: stride, pasta, or custom
+  framework: "stride"
+
+  # Analysis depth: quick, standard, deep
+  depth: "standard"
+
+  # Include abuse case analysis
+  include_abuse_cases: true
+
+  # Generate attack trees for threats above this risk level
+  attack_tree_threshold: "high"
+
+# Documentation Sources
+documentation:
+  # Paths to scan for architecture documentation
+  paths:
+    - "./docs"
+    - "./docs/architecture"
+    - "./README.md"
+
+  # File patterns to include
+  patterns:
+    - "**/*.md"
+    - "**/openapi.yaml"
+    - "**/openapi.json"
+    - "**/swagger.yaml"
+    - "**/swagger.json"
+    - "**/*.mmd"
+    - "**/*.puml"
+
+# Code Verification Settings
+verification:
+  # Paths to search for control implementations
+  code_paths:
+    - "./src"
+    - "./lib"
+    - "./app"
+
+  # Paths to exclude from search
+  exclude_paths:
+    - "./node_modules"
+    - "./**/*.test.*"
+    - "./**/*.spec.*"
+    - "./**/__tests__/**"
+    - "./dist"
+    - "./build"
+    - "./.git"
+
+  # Control search patterns by category
+  patterns:
+    authentication:
+      - "passport"
+      - "authenticate"
+      - "login"
+      - "signin"
+      - "bcrypt"
+      - "argon2"
+      - "jwt"
+      - "session"
+
+    authorization:
+      - "authorize"
+      - "isAuthorized"
+      - "checkPermission"
+      - "hasRole"
+      - "rbac"
+      - "acl"
+      - "permission"
+
+    input_validation:
+      - "validate"
+      - "sanitize"
+      - "escape"
+      - "joi"
+      - "yup"
+      - "zod"
+      - "express-validator"
+
+    encryption:
+      - "crypto"
+      - "encrypt"
+      - "decrypt"
+      - "cipher"
+      - "hash"
+
+    rate_limiting:
+      - "rate-limit"
+      - "rateLimit"
+      - "throttle"
+      - "express-rate-limit"
+
+    logging:
+      - "audit"
+      - "logger"
+      - "winston"
+      - "bunyan"
+      - "pino"
+
+# Risk Scoring Configuration
+risk:
+  # Likelihood scale (1-5)
+  likelihood_scale: 5
+
+  # Impact scale (1-5)
+  impact_scale: 5
+
+  # Risk calculation method: multiplicative, additive
+  risk_matrix: "multiplicative"
+
+  # Risk level thresholds
+  thresholds:
+    critical: 20  # 20-25
+    high: 12      # 12-19
+    medium: 6     # 6-11
+    low: 0        # 1-5
+
+# Compliance Frameworks
+compliance:
+  frameworks:
+    - name: "owasp"
+      version: "2021"
+      enabled: true
+
+    - name: "soc2"
+      enabled: true
+
+    - name: "pci-dss"
+      version: "4.0"
+      enabled: false
+
+    - name: "hipaa"
+      enabled: false
+
+    - name: "gdpr"
+      enabled: false
+
+  # Custom policy documents
+  custom_policies: []
+    # - "./policies/security-policy.md"
+    # - "./policies/data-handling.md"
+
+# Specialized Subsystem Analysis
+subsystems:
+  authentication:
+    enabled: true
+    paths:
+      - "./src/auth"
+      - "./src/middleware/auth*"
+
+  payments:
+    enabled: false
+    paths:
+      - "./src/payments"
+      - "./src/checkout"
+
+  api:
+    enabled: true
+    paths:
+      - "./src/routes"
+      - "./src/api"
+      - "./src/controllers"
+
+# Output Settings
+output:
+  # Default report format: markdown, html, json
+  format: "markdown"
+
+  # Include diagrams in reports
+  include_diagrams: true
+
+  # Include code evidence in reports
+  include_evidence: true
+
+  # Report detail level: executive, standard, detailed
+  report_level: "standard"
+
+# Drift Detection Settings
+drift:
+  # Number of baseline snapshots to retain
+  baseline_retention: 10
+
+  # Automatically create baseline on release tags
+  auto_baseline_on_release: true
+
+# Notification Settings (for future MCP integration)
+notifications:
+  critical_findings:
+    enabled: false
+    channels: []
+      # - "slack"
+      # - "email"
+
+  drift_detected:
+    enabled: false
+    channels: []
+
+# Integration Settings (for future MCP integration)
+integrations:
+  jira:
+    enabled: false
+    project_key: ""
+    create_issues: false
+
+  github:
+    enabled: false
+    create_issues: false
+    pr_comments: false
+
+  slack:
+    enabled: false
+    webhook_url: ""

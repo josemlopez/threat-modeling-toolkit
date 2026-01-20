@@ -1,0 +1,22 @@
+{
+  "name": "threat-modeling-toolkit",
+  "description": "AI-powered threat modeling toolkit with STRIDE/PASTA framework support. Analyze architecture, discover threats, verify controls, and generate comprehensive security reports.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jose M. Lopez",
+    "url": "https://github.com/josemlopez"
+  },
+  "homepage": "https://github.com/josemlopez/threat-modeling-toolkit",
+  "repository": "https://github.com/josemlopez/threat-modeling-toolkit",
+  "license": "MIT",
+  "keywords": [
+    "threat-modeling",
+    "security",
+    "stride",
+    "pasta",
+    "risk-analysis",
+    "compliance",
+    "owasp",
+    "security-assessment"
+  ]
+}
