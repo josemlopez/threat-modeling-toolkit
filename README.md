@@ -14,11 +14,46 @@
 
 ## Installation
 
+### Prerequisites
+
+- [Claude Code](https://claude.ai/code) installed and running
+- A terminal with Claude Code active
+
+### Step 1: Clone this repository
+
 ```bash
-/install github:josemlopez/threat-modeling-toolkit
+git clone https://github.com/josemlopez/threat-modeling-toolkit.git
 ```
 
-That's it. All 9 skills are now available in Claude Code.
+### Step 2: Add the skills to Claude Code
+
+In Claude Code, run:
+
+```
+/add-skill /path/to/threat-modeling-toolkit/skills/tm-init
+/add-skill /path/to/threat-modeling-toolkit/skills/tm-threats
+/add-skill /path/to/threat-modeling-toolkit/skills/tm-verify
+/add-skill /path/to/threat-modeling-toolkit/skills/tm-compliance
+/add-skill /path/to/threat-modeling-toolkit/skills/tm-report
+/add-skill /path/to/threat-modeling-toolkit/skills/tm-drift
+/add-skill /path/to/threat-modeling-toolkit/skills/tm-tests
+/add-skill /path/to/threat-modeling-toolkit/skills/tm-status
+/add-skill /path/to/threat-modeling-toolkit/skills/tm-full
+```
+
+Or add all skills at once by pointing to the skills directory:
+
+```
+/add-skill /path/to/threat-modeling-toolkit/skills
+```
+
+### Step 3: Verify installation
+
+```
+/tm-status
+```
+
+If you see the status command respond, you're ready to go.
 
 ---
 
@@ -26,16 +61,17 @@ That's it. All 9 skills are now available in Claude Code.
 
 The toolkit includes a test project you can analyze immediately.
 
-### Step 1: Clone and navigate to the test app
+### Step 1: Navigate to the test app
 
 ```bash
-git clone https://github.com/josemlopez/threat-modeling-toolkit.git
 cd threat-modeling-toolkit/TEST/simple-app
 ```
 
 ### Step 2: Run the full analysis
 
-```bash
+In Claude Code:
+
+```
 /tm-full --docs ./docs --compliance owasp,soc2
 ```
 
