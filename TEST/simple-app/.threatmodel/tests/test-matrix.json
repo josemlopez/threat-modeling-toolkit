@@ -1,0 +1,181 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T13:10:00Z",
+  "coverage": {
+    "threats_total": 15,
+    "threats_with_tests": 12,
+    "threats_without_tests": 3,
+    "controls_total": 15,
+    "controls_with_tests": 8,
+    "test_coverage_percentage": 80
+  },
+  "test_files": [
+    {
+      "file": "auth-security.test.js",
+      "category": "authentication",
+      "test_count": 10
+    },
+    {
+      "file": "authz-security.test.js",
+      "category": "authorization",
+      "test_count": 8
+    },
+    {
+      "file": "input-validation.test.js",
+      "category": "input-validation",
+      "test_count": 11
+    }
+  ],
+  "matrix": [
+    {
+      "threat_id": "threat-001",
+      "threat_title": "Credential Stuffing Attack",
+      "test_ids": ["TEST-001", "TEST-002"],
+      "controls_tested": ["control-003"],
+      "coverage": "full"
+    },
+    {
+      "threat_id": "threat-002",
+      "threat_title": "Password Reset Flood",
+      "test_ids": ["TEST-003"],
+      "controls_tested": ["control-009"],
+      "coverage": "gap-documented",
+      "notes": "Test expected to fail until GAP-003 fixed"
+    },
+    {
+      "threat_id": "threat-003",
+      "threat_title": "BOLA - Task Update",
+      "test_ids": ["TEST-011", "TEST-012", "TEST-013"],
+      "controls_tested": ["control-010"],
+      "coverage": "gap-documented",
+      "notes": "Test expected to fail until GAP-001 fixed"
+    },
+    {
+      "threat_id": "threat-004",
+      "threat_title": "BOLA - Task Delete",
+      "test_ids": ["TEST-014", "TEST-015", "TEST-016"],
+      "controls_tested": ["control-010"],
+      "coverage": "gap-documented",
+      "notes": "Test expected to fail until GAP-002 fixed"
+    },
+    {
+      "threat_id": "threat-005",
+      "threat_title": "CSRF Attack",
+      "test_ids": ["TEST-022", "TEST-023"],
+      "controls_tested": ["control-011"],
+      "coverage": "gap-documented",
+      "notes": "Test expected to fail until GAP-005 fixed"
+    },
+    {
+      "threat_id": "threat-006",
+      "threat_title": "JWT Token Theft",
+      "test_ids": ["TEST-008", "TEST-009", "TEST-010"],
+      "controls_tested": ["control-002"],
+      "coverage": "full"
+    },
+    {
+      "threat_id": "threat-007",
+      "threat_title": "Brute Force Login",
+      "test_ids": ["TEST-001"],
+      "controls_tested": ["control-003", "control-014"],
+      "coverage": "partial",
+      "notes": "Rate limiting tested, account lockout not implemented"
+    },
+    {
+      "threat_id": "threat-009",
+      "threat_title": "SQL Injection",
+      "test_ids": ["TEST-019", "TEST-020", "TEST-021"],
+      "controls_tested": ["control-004"],
+      "coverage": "full"
+    },
+    {
+      "threat_id": "threat-011",
+      "threat_title": "Weak Password Policy",
+      "test_ids": ["TEST-006", "TEST-007"],
+      "controls_tested": ["control-015"],
+      "coverage": "gap-documented",
+      "notes": "Test expected to fail until GAP-008 fixed"
+    },
+    {
+      "threat_id": "threat-012",
+      "threat_title": "Account Enumeration",
+      "test_ids": ["TEST-024", "TEST-025"],
+      "controls_tested": ["control-006"],
+      "coverage": "gap-documented",
+      "notes": "Registration enumeration test expected to fail until GAP-009 fixed"
+    },
+    {
+      "threat_id": "threat-013",
+      "threat_title": "Missing MFA",
+      "test_ids": [],
+      "controls_tested": ["control-012"],
+      "coverage": "not-testable",
+      "notes": "MFA not implemented - cannot test"
+    },
+    {
+      "threat_id": "threat-014",
+      "threat_title": "Insecure Reset Token",
+      "test_ids": ["TEST-004", "TEST-005"],
+      "controls_tested": ["control-005"],
+      "coverage": "partial",
+      "notes": "Token entropy test requires DB access"
+    }
+  ],
+  "untested": {
+    "threats": [
+      {
+        "id": "threat-008",
+        "title": "JWT Secret Exposure",
+        "reason": "Requires access to environment/secrets"
+      },
+      {
+        "id": "threat-010",
+        "title": "Insufficient Logging",
+        "reason": "Logging not implemented - cannot verify"
+      },
+      {
+        "id": "threat-015",
+        "title": "SendGrid API Key Exposure",
+        "reason": "Requires access to external service"
+      }
+    ],
+    "controls": [
+      {
+        "id": "control-012",
+        "name": "MFA",
+        "reason": "Not implemented"
+      },
+      {
+        "id": "control-013",
+        "name": "Security Logging",
+        "reason": "Not implemented"
+      }
+    ]
+  },
+  "expected_failures": [
+    {
+      "test_id": "TEST-003",
+      "reason": "GAP-003: No rate limiting on forgot-password"
+    },
+    {
+      "test_id": "TEST-006",
+      "reason": "GAP-008: No password strength requirements"
+    },
+    {
+      "test_id": "TEST-012",
+      "reason": "GAP-001: Missing BOLA check on task update"
+    },
+    {
+      "test_id": "TEST-015",
+      "reason": "GAP-002: Missing BOLA check on task delete"
+    },
+    {
+      "test_id": "TEST-022",
+      "reason": "GAP-005: No CSRF protection"
+    },
+    {
+      "test_id": "TEST-024",
+      "reason": "GAP-009: Registration reveals existing emails"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+flowchart LR
+    subgraph "Authentication Flow"
+        A1[Login Form] -->|"credentials"| A2[Auth API]
+        A2 -->|"verify"| A3[(Users DB)]
+        A3 -->|"user data"| A2
+        A2 -->|"JWT token"| A1
+    end
+
+    subgraph "Registration Flow"
+        R1[Register Form] -->|"email, password, name"| R2[Auth API]
+        R2 -->|"hash + store"| R3[(Users DB)]
+    end
+
+    subgraph "Task Operations"
+        T1[Task Manager] -->|"JWT + task data"| T2[Task API]
+        T2 -->|"CRUD"| T3[(Tasks DB)]
+        T3 -->|"results"| T2
+        T2 -->|"response"| T1
+    end
+
+    subgraph "Password Reset"
+        P1[Forgot Password] -->|"email"| P2[Auth API]
+        P2 -->|"store token"| P3[(Users DB)]
+        P2 -->|"reset email"| P4[SendGrid]
+    end

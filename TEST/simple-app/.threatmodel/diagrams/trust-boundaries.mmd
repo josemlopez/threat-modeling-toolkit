@@ -1,0 +1,37 @@
+graph TB
+    subgraph TB1["Trust Boundary: Public Internet"]
+        USER(("User"))
+        BROWSER["Web Browser"]
+        REACT["React App"]
+    end
+
+    subgraph TB2["Trust Boundary: Internal Services"]
+        API["Express API"]
+        AUTH["Auth Middleware"]
+        ROUTES["Route Handlers"]
+    end
+
+    subgraph TB3["Trust Boundary: Data Layer"]
+        DB[("PostgreSQL")]
+        USERS["Users Table"]
+        TASKS["Tasks Table"]
+    end
+
+    subgraph TB4["Trust Boundary: External"]
+        SENDGRID["SendGrid API"]
+    end
+
+    USER --> BROWSER
+    BROWSER --> REACT
+    REACT -.->|"TB-001: HTTPS + JWT"| API
+    API --> AUTH
+    AUTH --> ROUTES
+    ROUTES -.->|"TB-002: TLS + Credentials"| DB
+    DB --> USERS
+    DB --> TASKS
+    ROUTES -.->|"TB-003: HTTPS + API Key"| SENDGRID
+
+    style TB1 fill:#ffebee
+    style TB2 fill:#e3f2fd
+    style TB3 fill:#f3e5f5
+    style TB4 fill:#fff8e1

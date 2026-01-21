@@ -1,0 +1,427 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T12:55:00Z",
+  "framework": "STRIDE",
+  "threats": [
+    {
+      "id": "threat-001",
+      "title": "Credential Stuffing Attack",
+      "category": "spoofing",
+      "framework": "STRIDE",
+      "description": "Attacker uses leaked credentials from other breaches to gain unauthorized access to user accounts. Rate limiting exists but may be insufficient for distributed attacks.",
+      "target": {
+        "asset_id": "asset-002",
+        "attack_surface_id": "as-002",
+        "entry_point": "POST /api/auth/login"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["Leaked credential database", "Knowledge of login endpoint"],
+      "impact": {
+        "confidentiality": "high",
+        "integrity": "medium",
+        "availability": "low"
+      },
+      "likelihood": 4,
+      "likelihood_rationale": "Common attack, tools readily available, only basic rate limiting in place",
+      "impact_score": 4,
+      "impact_rationale": "Account takeover leads to data access and potential impersonation",
+      "risk_score": 16,
+      "risk_level": "critical",
+      "mitre_attack": ["T1110.004"],
+      "cwe": ["CWE-307", "CWE-521"],
+      "countermeasures": ["Implement MFA", "Enhanced rate limiting", "Account lockout", "Credential breach monitoring"]
+    },
+    {
+      "id": "threat-002",
+      "title": "Password Reset Flood Attack",
+      "category": "denial-of-service",
+      "framework": "STRIDE",
+      "description": "Attacker floods the password reset endpoint with requests, causing email spam to users and potential service degradation. No rate limiting on this endpoint.",
+      "target": {
+        "asset_id": "asset-002",
+        "attack_surface_id": "as-003",
+        "entry_point": "POST /api/auth/forgot-password"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["Knowledge of valid email addresses", "No rate limiting"],
+      "impact": {
+        "confidentiality": "low",
+        "integrity": "low",
+        "availability": "high"
+      },
+      "likelihood": 5,
+      "likelihood_rationale": "Trivial to exploit - no rate limiting, public endpoint",
+      "impact_score": 3,
+      "impact_rationale": "Email spam, user annoyance, potential SendGrid cost increase",
+      "risk_score": 15,
+      "risk_level": "high",
+      "mitre_attack": ["T1499"],
+      "cwe": ["CWE-770", "CWE-799"],
+      "countermeasures": ["Add rate limiting to forgot-password endpoint", "CAPTCHA", "Email throttling"]
+    },
+    {
+      "id": "threat-003",
+      "title": "Broken Object-Level Authorization (BOLA) - Task Update",
+      "category": "elevation-of-privilege",
+      "framework": "STRIDE",
+      "description": "Authenticated user can update any task by ID, regardless of ownership. The endpoint only checks authentication but not authorization.",
+      "target": {
+        "asset_id": "asset-002",
+        "attack_surface_id": "as-006",
+        "entry_point": "PUT /api/tasks/:id"
+      },
+      "threat_actor": "authenticated-user",
+      "prerequisites": ["Valid JWT token", "Knowledge of other users' task IDs"],
+      "impact": {
+        "confidentiality": "medium",
+        "integrity": "high",
+        "availability": "low"
+      },
+      "likelihood": 4,
+      "likelihood_rationale": "Easy to exploit with valid authentication, sequential IDs may be guessable",
+      "impact_score": 4,
+      "impact_rationale": "Can modify other users' tasks, data integrity compromise",
+      "risk_score": 16,
+      "risk_level": "critical",
+      "mitre_attack": ["T1548"],
+      "cwe": ["CWE-639", "CWE-284"],
+      "countermeasures": ["Add ownership check before update", "Use UUIDs instead of sequential IDs"]
+    },
+    {
+      "id": "threat-004",
+      "title": "Broken Object-Level Authorization (BOLA) - Task Delete",
+      "category": "elevation-of-privilege",
+      "framework": "STRIDE",
+      "description": "Authenticated user can delete any task by ID, regardless of ownership. The endpoint only checks authentication but not authorization.",
+      "target": {
+        "asset_id": "asset-002",
+        "attack_surface_id": "as-007",
+        "entry_point": "DELETE /api/tasks/:id"
+      },
+      "threat_actor": "authenticated-user",
+      "prerequisites": ["Valid JWT token", "Knowledge of other users' task IDs"],
+      "impact": {
+        "confidentiality": "low",
+        "integrity": "high",
+        "availability": "medium"
+      },
+      "likelihood": 4,
+      "likelihood_rationale": "Easy to exploit with valid authentication",
+      "impact_score": 4,
+      "impact_rationale": "Can delete other users' tasks, data loss",
+      "risk_score": 16,
+      "risk_level": "critical",
+      "mitre_attack": ["T1548", "T1485"],
+      "cwe": ["CWE-639", "CWE-284"],
+      "countermeasures": ["Add ownership check before delete", "Soft delete with recovery option"]
+    },
+    {
+      "id": "threat-005",
+      "title": "Cross-Site Request Forgery (CSRF)",
+      "category": "tampering",
+      "framework": "STRIDE",
+      "description": "Attacker tricks authenticated user into performing unintended actions (create, update, delete tasks) via malicious website or email link.",
+      "target": {
+        "asset_id": "asset-001",
+        "attack_surface_id": "as-008",
+        "entry_point": "React Web Application"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["User is authenticated", "User visits malicious page"],
+      "impact": {
+        "confidentiality": "low",
+        "integrity": "high",
+        "availability": "medium"
+      },
+      "likelihood": 3,
+      "likelihood_rationale": "Requires user interaction, but no CSRF protection exists",
+      "impact_score": 3,
+      "impact_rationale": "Unauthorized task modifications on behalf of user",
+      "risk_score": 9,
+      "risk_level": "medium",
+      "mitre_attack": ["T1185"],
+      "cwe": ["CWE-352"],
+      "countermeasures": ["Implement CSRF tokens", "SameSite cookie attribute", "Verify Origin header"]
+    },
+    {
+      "id": "threat-006",
+      "title": "JWT Token Theft via XSS",
+      "category": "spoofing",
+      "framework": "STRIDE",
+      "description": "If XSS vulnerability exists, attacker can steal JWT token from localStorage/sessionStorage and impersonate the user.",
+      "target": {
+        "asset_id": "asset-004",
+        "attack_surface_id": "as-008",
+        "entry_point": "React Web Application"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["XSS vulnerability in frontend", "JWT stored in accessible storage"],
+      "impact": {
+        "confidentiality": "high",
+        "integrity": "high",
+        "availability": "low"
+      },
+      "likelihood": 3,
+      "likelihood_rationale": "Depends on XSS vulnerability existing",
+      "impact_score": 4,
+      "impact_rationale": "Full account takeover for token validity period",
+      "risk_score": 12,
+      "risk_level": "high",
+      "mitre_attack": ["T1539", "T1189"],
+      "cwe": ["CWE-79", "CWE-922"],
+      "countermeasures": ["Use HttpOnly cookies", "Content Security Policy", "Input sanitization"]
+    },
+    {
+      "id": "threat-007",
+      "title": "Brute Force Login Attack",
+      "category": "spoofing",
+      "framework": "STRIDE",
+      "description": "Attacker attempts to guess user passwords through automated login attempts. Rate limiting exists but may be bypassed with distributed IPs.",
+      "target": {
+        "asset_id": "asset-002",
+        "attack_surface_id": "as-002",
+        "entry_point": "POST /api/auth/login"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["Valid username/email", "Time and resources"],
+      "impact": {
+        "confidentiality": "high",
+        "integrity": "medium",
+        "availability": "low"
+      },
+      "likelihood": 3,
+      "likelihood_rationale": "Rate limiting provides some protection but no account lockout",
+      "impact_score": 4,
+      "impact_rationale": "Account takeover if successful",
+      "risk_score": 12,
+      "risk_level": "high",
+      "mitre_attack": ["T1110.001"],
+      "cwe": ["CWE-307"],
+      "countermeasures": ["Account lockout after N failures", "CAPTCHA after failures", "MFA"]
+    },
+    {
+      "id": "threat-008",
+      "title": "JWT Secret Key Exposure",
+      "category": "information-disclosure",
+      "framework": "STRIDE",
+      "description": "If JWT_SECRET environment variable is exposed or weak, attacker can forge valid JWT tokens for any user.",
+      "target": {
+        "asset_id": "asset-004",
+        "attack_surface_id": null,
+        "entry_point": "JWT Authentication System"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["Access to server environment", "Weak secret discovery"],
+      "impact": {
+        "confidentiality": "high",
+        "integrity": "high",
+        "availability": "high"
+      },
+      "likelihood": 2,
+      "likelihood_rationale": "Requires access to environment or very weak secret",
+      "impact_score": 5,
+      "impact_rationale": "Complete authentication bypass for all users",
+      "risk_score": 10,
+      "risk_level": "high",
+      "mitre_attack": ["T1552.001"],
+      "cwe": ["CWE-798", "CWE-321"],
+      "countermeasures": ["Strong random secret", "Secret rotation", "Use asymmetric keys (RS256)"]
+    },
+    {
+      "id": "threat-009",
+      "title": "SQL Injection",
+      "category": "tampering",
+      "framework": "STRIDE",
+      "description": "If parameterized queries fail or are bypassed, attacker could inject SQL commands to access or modify database.",
+      "target": {
+        "asset_id": "asset-003",
+        "attack_surface_id": "as-001",
+        "entry_point": "Database queries"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["Vulnerable query construction", "Knowledge of database schema"],
+      "impact": {
+        "confidentiality": "high",
+        "integrity": "high",
+        "availability": "high"
+      },
+      "likelihood": 2,
+      "likelihood_rationale": "Code uses parameterized queries ($1, $2), but risk exists if bypassed",
+      "impact_score": 5,
+      "impact_rationale": "Full database access, data theft, modification, deletion",
+      "risk_score": 10,
+      "risk_level": "high",
+      "mitre_attack": ["T1190"],
+      "cwe": ["CWE-89"],
+      "countermeasures": ["Maintain parameterized queries", "Input validation", "WAF", "Least privilege DB user"]
+    },
+    {
+      "id": "threat-010",
+      "title": "Insufficient Logging and Monitoring",
+      "category": "repudiation",
+      "framework": "STRIDE",
+      "description": "Security events (failed logins, unauthorized access attempts) may not be properly logged, making incident detection and forensics difficult.",
+      "target": {
+        "asset_id": "asset-002",
+        "attack_surface_id": null,
+        "entry_point": "All API endpoints"
+      },
+      "threat_actor": "any",
+      "prerequisites": ["Lack of logging infrastructure"],
+      "impact": {
+        "confidentiality": "medium",
+        "integrity": "low",
+        "availability": "low"
+      },
+      "likelihood": 4,
+      "likelihood_rationale": "No logging code visible in routes",
+      "impact_score": 3,
+      "impact_rationale": "Unable to detect or investigate security incidents",
+      "risk_score": 12,
+      "risk_level": "high",
+      "mitre_attack": ["T1562.002"],
+      "cwe": ["CWE-778", "CWE-223"],
+      "countermeasures": ["Implement security event logging", "Centralized log management", "Alerting"]
+    },
+    {
+      "id": "threat-011",
+      "title": "Weak Password Policy",
+      "category": "spoofing",
+      "framework": "STRIDE",
+      "description": "No visible password strength requirements during registration allows users to create weak passwords.",
+      "target": {
+        "asset_id": "asset-002",
+        "attack_surface_id": "as-001",
+        "entry_point": "POST /api/auth/register"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["Users choose weak passwords"],
+      "impact": {
+        "confidentiality": "high",
+        "integrity": "medium",
+        "availability": "low"
+      },
+      "likelihood": 4,
+      "likelihood_rationale": "Users commonly choose weak passwords without enforcement",
+      "impact_score": 3,
+      "impact_rationale": "Easier brute force/dictionary attacks",
+      "risk_score": 12,
+      "risk_level": "high",
+      "mitre_attack": ["T1110"],
+      "cwe": ["CWE-521"],
+      "countermeasures": ["Minimum length requirement", "Complexity rules", "Compromised password check"]
+    },
+    {
+      "id": "threat-012",
+      "title": "Mass Account Enumeration via Registration",
+      "category": "information-disclosure",
+      "framework": "STRIDE",
+      "description": "Registration endpoint returns specific error when email already exists, allowing enumeration of valid accounts.",
+      "target": {
+        "asset_id": "asset-002",
+        "attack_surface_id": "as-001",
+        "entry_point": "POST /api/auth/register"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["List of potential emails"],
+      "impact": {
+        "confidentiality": "medium",
+        "integrity": "low",
+        "availability": "low"
+      },
+      "likelihood": 4,
+      "likelihood_rationale": "Endpoint explicitly returns 'Email already exists'",
+      "impact_score": 2,
+      "impact_rationale": "Enables targeted attacks on known accounts",
+      "risk_score": 8,
+      "risk_level": "medium",
+      "mitre_attack": ["T1589.002"],
+      "cwe": ["CWE-204"],
+      "countermeasures": ["Generic error messages", "Rate limiting", "CAPTCHA"]
+    },
+    {
+      "id": "threat-013",
+      "title": "Missing MFA Allows Single-Factor Compromise",
+      "category": "spoofing",
+      "framework": "STRIDE",
+      "description": "Authentication relies solely on password. If password is compromised, no secondary factor prevents account takeover.",
+      "target": {
+        "asset_id": "asset-004",
+        "attack_surface_id": "as-002",
+        "entry_point": "Authentication System"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["Compromised password via phishing, breach, or guessing"],
+      "impact": {
+        "confidentiality": "high",
+        "integrity": "high",
+        "availability": "low"
+      },
+      "likelihood": 4,
+      "likelihood_rationale": "No MFA implementation exists",
+      "impact_score": 4,
+      "impact_rationale": "Full account compromise with no additional barriers",
+      "risk_score": 16,
+      "risk_level": "critical",
+      "mitre_attack": ["T1078"],
+      "cwe": ["CWE-308"],
+      "countermeasures": ["Implement TOTP/authenticator app MFA", "WebAuthn/passkeys", "Email verification for new devices"]
+    },
+    {
+      "id": "threat-014",
+      "title": "Insecure Password Reset Token",
+      "category": "spoofing",
+      "framework": "STRIDE",
+      "description": "Password reset token may be predictable or have insufficient entropy if crypto.randomBytes fails or is misconfigured.",
+      "target": {
+        "asset_id": "asset-002",
+        "attack_surface_id": "as-003",
+        "entry_point": "POST /api/auth/forgot-password"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["Weak token generation", "Token interception"],
+      "impact": {
+        "confidentiality": "high",
+        "integrity": "high",
+        "availability": "low"
+      },
+      "likelihood": 2,
+      "likelihood_rationale": "Uses crypto.randomBytes(32) which is secure if working",
+      "impact_score": 4,
+      "impact_rationale": "Account takeover via password reset",
+      "risk_score": 8,
+      "risk_level": "medium",
+      "mitre_attack": ["T1078"],
+      "cwe": ["CWE-640", "CWE-330"],
+      "countermeasures": ["Verify token entropy", "Single-use tokens", "Short expiration"]
+    },
+    {
+      "id": "threat-015",
+      "title": "SendGrid API Key Exposure",
+      "category": "information-disclosure",
+      "framework": "STRIDE",
+      "description": "If SENDGRID_API_KEY is exposed, attacker can send emails as the application, enabling phishing attacks.",
+      "target": {
+        "asset_id": "asset-005",
+        "attack_surface_id": null,
+        "entry_point": "SendGrid Integration"
+      },
+      "threat_actor": "external-attacker",
+      "prerequisites": ["Access to environment variables or codebase"],
+      "impact": {
+        "confidentiality": "medium",
+        "integrity": "high",
+        "availability": "low"
+      },
+      "likelihood": 2,
+      "likelihood_rationale": "Requires access to server environment",
+      "impact_score": 3,
+      "impact_rationale": "Can send phishing emails appearing from application",
+      "risk_score": 6,
+      "risk_level": "medium",
+      "mitre_attack": ["T1552.001", "T1566"],
+      "cwe": ["CWE-798"],
+      "countermeasures": ["Secure environment variable storage", "API key rotation", "Domain verification"]
+    }
+  ]
+}

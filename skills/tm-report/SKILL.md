@@ -120,7 +120,36 @@ This assessment identified [X] security risks across [Y] system components.
 
 ## Risk Overview
 
-### Risk Distribution
+### At a Glance
+
+```
+RISK POSTURE: [LEVEL]
+═══════════════════════════════════════════════════════════
+
+Threats:    47 identified
+Controls:   29 analyzed
+Gaps:       11 found
+
+SEVERITY DISTRIBUTION
+─────────────────────────────────────────────────────────
+CRITICAL │██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  5
+    HIGH │████████████████████████░░░░░░░░░░░░░░░░│ 12
+  MEDIUM │████████████████████████████████████░░░░│ 18
+     LOW │████████████████████████░░░░░░░░░░░░░░░░│ 12
+
+CONTROL STATUS
+─────────────────────────────────────────────────────────
+✓ Verified:     18 controls
+⚠ Partial:       7 controls
+✗ Missing:       4 controls
+
+COMPLIANCE
+─────────────────────────────────────────────────────────
+OWASP Top 10:   ████████░░ 82%
+SOC2:           █████████░ 88%
+```
+
+### Risk Distribution Table
 
 | Severity | Count | Mitigated | Unmitigated |
 |----------|-------|-----------|-------------|
@@ -128,10 +157,6 @@ This assessment identified [X] security risks across [Y] system components.
 | High | X | Y | Z |
 | Medium | X | Y | Z |
 | Low | X | Y | Z |
-
-### Risk Heat Map
-
-[Visual representation]
 
 ---
 
@@ -259,10 +284,12 @@ When executing this skill:
    - Document gaps
    - Provide recommendations
 
-5. **Include visualizations**:
-   - Risk heat map (text-based)
-   - Compliance bar charts (text-based)
-   - Architecture diagrams (Mermaid)
+5. **Include visualizations IN THE REPORT FILES** (not just console):
+   - Use ASCII progress bars: `████████░░ 82%`
+   - Use status indicators: `✓`, `⚠`, `✗`
+   - Use box-drawing characters for visual separation
+   - Include Mermaid diagrams for architecture
+   - The "At a Glance" section with visual bars MUST be in the written report file
 
 6. **Write report files**:
    - Create reports directory if needed

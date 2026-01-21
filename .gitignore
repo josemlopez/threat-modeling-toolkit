@@ -40,3 +40,5 @@ temp/
 # Generated threat model files (user projects)
 # Users should NOT ignore these in their projects
 # .threatmodel/
+
+posts/*

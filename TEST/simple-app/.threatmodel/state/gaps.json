@@ -1,0 +1,244 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T13:00:00Z",
+  "gaps": [
+    {
+      "id": "gap-001",
+      "control_id": "control-010",
+      "title": "Missing Object-Level Authorization on Task Update",
+      "description": "PUT /api/tasks/:id does not verify that the authenticated user owns the task being modified",
+      "expected": "Query should include 'WHERE id = $5 AND user_id = $6' to ensure ownership",
+      "actual": "Query only checks 'WHERE id = $5', allowing any authenticated user to modify any task",
+      "severity": "critical",
+      "evidence": {
+        "code_location": "src/routes/tasks.js:50-52",
+        "code_snippet": "UPDATE tasks SET ... WHERE id = $5",
+        "developer_comment": "// BUG: Should check if user owns this task!"
+      },
+      "remediation": {
+        "recommendation": "Add ownership check: 'WHERE id = $1 AND user_id = $2' or use middleware",
+        "effort": "low",
+        "priority": "critical",
+        "example": "UPDATE tasks SET ... WHERE id = $5 AND user_id = $6"
+      },
+      "related_threats": ["threat-003"],
+      "cwe": ["CWE-639", "CWE-284"]
+    },
+    {
+      "id": "gap-002",
+      "control_id": "control-010",
+      "title": "Missing Object-Level Authorization on Task Delete",
+      "description": "DELETE /api/tasks/:id does not verify that the authenticated user owns the task being deleted",
+      "expected": "Query should include 'WHERE id = $1 AND user_id = $2' to ensure ownership",
+      "actual": "Query only checks 'WHERE id = $1', allowing any authenticated user to delete any task",
+      "severity": "critical",
+      "evidence": {
+        "code_location": "src/routes/tasks.js:72-74",
+        "code_snippet": "DELETE FROM tasks WHERE id = $1",
+        "developer_comment": "// BUG: Should check if user owns this task!"
+      },
+      "remediation": {
+        "recommendation": "Add ownership check: 'WHERE id = $1 AND user_id = $2'",
+        "effort": "low",
+        "priority": "critical",
+        "example": "DELETE FROM tasks WHERE id = $1 AND user_id = req.user.userId"
+      },
+      "related_threats": ["threat-004"],
+      "cwe": ["CWE-639", "CWE-284"]
+    },
+    {
+      "id": "gap-003",
+      "control_id": "control-009",
+      "title": "Missing Rate Limiting on Password Reset",
+      "description": "POST /api/auth/forgot-password has no rate limiting, enabling flood attacks",
+      "expected": "Rate limiting similar to login endpoint (e.g., 5 requests per 15 minutes)",
+      "actual": "No rate limiter middleware applied to the route",
+      "severity": "high",
+      "evidence": {
+        "code_location": "src/routes/auth.js:71",
+        "code_snippet": "router.post('/forgot-password', async (req, res) => {",
+        "comparison": "Login route has 'loginLimiter' middleware, this route does not"
+      },
+      "remediation": {
+        "recommendation": "Apply rate limiter middleware: router.post('/forgot-password', loginLimiter, async...)",
+        "effort": "trivial",
+        "priority": "high",
+        "example": "router.post('/forgot-password', loginLimiter, async (req, res) => {"
+      },
+      "related_threats": ["threat-002"],
+      "cwe": ["CWE-770", "CWE-799"]
+    },
+    {
+      "id": "gap-004",
+      "control_id": "control-012",
+      "title": "No Multi-Factor Authentication",
+      "description": "Application relies solely on password authentication with no MFA option",
+      "expected": "TOTP-based or SMS-based second factor for sensitive operations",
+      "actual": "Single-factor (password) authentication only",
+      "severity": "critical",
+      "evidence": {
+        "code_search": "No MFA, TOTP, 2FA patterns found in codebase",
+        "login_flow": "src/routes/auth.js:38-68 - returns token immediately after password verification"
+      },
+      "remediation": {
+        "recommendation": "Implement TOTP-based MFA using speakeasy or otplib library",
+        "effort": "high",
+        "priority": "high",
+        "steps": [
+          "Add MFA setup endpoint for users",
+          "Store encrypted TOTP secret",
+          "Add MFA verification step to login",
+          "Provide recovery codes"
+        ]
+      },
+      "related_threats": ["threat-001", "threat-013"],
+      "cwe": ["CWE-308"]
+    },
+    {
+      "id": "gap-005",
+      "control_id": "control-011",
+      "title": "No CSRF Protection",
+      "description": "No Cross-Site Request Forgery protection implemented for state-changing operations",
+      "expected": "CSRF tokens or SameSite cookie attributes to prevent cross-origin attacks",
+      "actual": "No CSRF middleware or token validation found",
+      "severity": "medium",
+      "evidence": {
+        "code_search": "No csrf, csurf, or CSRF patterns found",
+        "state_changing_routes": ["POST /tasks", "PUT /tasks/:id", "DELETE /tasks/:id"]
+      },
+      "remediation": {
+        "recommendation": "Implement CSRF protection using csurf middleware or SameSite=Strict cookies",
+        "effort": "medium",
+        "priority": "medium",
+        "example": "app.use(csrf({ cookie: { sameSite: 'strict' } }))"
+      },
+      "related_threats": ["threat-005"],
+      "cwe": ["CWE-352"]
+    },
+    {
+      "id": "gap-006",
+      "control_id": "control-013",
+      "title": "No Security Event Logging",
+      "description": "No audit logging for security-relevant events like failed logins, access violations, or data modifications",
+      "expected": "Structured logging of authentication events, authorization failures, and sensitive operations",
+      "actual": "No logging library or audit mechanism found",
+      "severity": "high",
+      "evidence": {
+        "code_search": "No winston, bunyan, pino, or audit logging patterns found",
+        "impact": "Cannot detect attacks, perform forensics, or meet compliance requirements"
+      },
+      "remediation": {
+        "recommendation": "Implement structured logging with winston or pino, log security events to SIEM",
+        "effort": "medium",
+        "priority": "high",
+        "events_to_log": [
+          "Login success/failure",
+          "Password reset requests",
+          "Authorization failures",
+          "Data modifications"
+        ]
+      },
+      "related_threats": ["threat-010"],
+      "cwe": ["CWE-778", "CWE-223"]
+    },
+    {
+      "id": "gap-007",
+      "control_id": "control-014",
+      "title": "No Account Lockout Mechanism",
+      "description": "Accounts are not locked after repeated failed login attempts",
+      "expected": "Account lockout after 5-10 failed attempts with exponential backoff",
+      "actual": "Only rate limiting exists, no per-account lockout",
+      "severity": "high",
+      "evidence": {
+        "code_search": "No lockout, locked, or failed_attempts tracking found",
+        "limitation": "Rate limiting is IP-based, can be bypassed with multiple IPs"
+      },
+      "remediation": {
+        "recommendation": "Track failed attempts per account, lock after threshold, require admin unlock or time-based unlock",
+        "effort": "medium",
+        "priority": "high",
+        "schema_change": "Add failed_login_count and locked_until columns to users table"
+      },
+      "related_threats": ["threat-007"],
+      "cwe": ["CWE-307"]
+    },
+    {
+      "id": "gap-008",
+      "control_id": "control-015",
+      "title": "No Password Strength Requirements",
+      "description": "Registration accepts any password without length or complexity requirements",
+      "expected": "Minimum 12 characters, complexity rules, or compromised password check",
+      "actual": "Only checks if password field is present, not its strength",
+      "severity": "high",
+      "evidence": {
+        "code_location": "src/routes/auth.js:14",
+        "code_snippet": "if (!email || !password || !name)",
+        "note": "Only presence check, no length or complexity validation"
+      },
+      "remediation": {
+        "recommendation": "Use zxcvbn for strength checking, enforce minimum 12 characters, check against breach databases",
+        "effort": "low",
+        "priority": "medium",
+        "example": "if (password.length < 12 || zxcvbn(password).score < 3)"
+      },
+      "related_threats": ["threat-011"],
+      "cwe": ["CWE-521"]
+    },
+    {
+      "id": "gap-009",
+      "control_id": "control-006",
+      "title": "User Enumeration via Registration",
+      "description": "Registration endpoint reveals when an email is already registered",
+      "expected": "Generic error message that doesn't reveal account existence",
+      "actual": "Returns 'Email already exists' on duplicate email",
+      "severity": "medium",
+      "evidence": {
+        "code_location": "src/routes/auth.js:31",
+        "code_snippet": "return res.status(400).json({ error: 'Email already exists' });"
+      },
+      "remediation": {
+        "recommendation": "Return generic 'Registration failed' message, send email to existing users instead",
+        "effort": "low",
+        "priority": "low",
+        "example": "res.status(400).json({ error: 'Unable to complete registration' })"
+      },
+      "related_threats": ["threat-012"],
+      "cwe": ["CWE-204"]
+    },
+    {
+      "id": "gap-010",
+      "control_id": "control-008",
+      "title": "No Schema-Based Input Validation",
+      "description": "Input validation uses manual checks instead of a validation library",
+      "expected": "Schema validation with Joi, Yup, or Zod for all input",
+      "actual": "Manual presence checks only, no type validation or sanitization",
+      "severity": "medium",
+      "evidence": {
+        "code_search": "No joi, yup, zod, or ajv validation libraries found",
+        "risk": "Potential for type confusion, injection, or unexpected input handling"
+      },
+      "remediation": {
+        "recommendation": "Implement Zod or Joi schemas for all API endpoints",
+        "effort": "medium",
+        "priority": "medium"
+      },
+      "related_threats": ["threat-009"],
+      "cwe": ["CWE-20"]
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "by_severity": {
+      "critical": 3,
+      "high": 5,
+      "medium": 2,
+      "low": 0
+    },
+    "by_effort": {
+      "trivial": 1,
+      "low": 3,
+      "medium": 5,
+      "high": 1
+    }
+  }
+}

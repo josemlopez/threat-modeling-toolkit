@@ -1,0 +1,78 @@
+{
+  "version": "1.0",
+  "created": "2026-01-20T13:15:00Z",
+  "project": "TaskFlow",
+  "snapshot": {
+    "assets": {
+      "total": 5,
+      "by_type": {
+        "client": 1,
+        "service": 1,
+        "data-store": 1,
+        "identity": 1,
+        "integration": 1
+      },
+      "items": [
+        {"id": "asset-001", "name": "React Frontend", "type": "client", "classification": "public"},
+        {"id": "asset-002", "name": "Express API", "type": "service", "classification": "internal"},
+        {"id": "asset-003", "name": "PostgreSQL Database", "type": "data-store", "classification": "restricted"},
+        {"id": "asset-004", "name": "JWT Authentication", "type": "identity", "classification": "confidential"},
+        {"id": "asset-005", "name": "SendGrid Integration", "type": "integration", "classification": "internal"}
+      ]
+    },
+    "dataflows": {
+      "total": 8,
+      "crossing_boundaries": 8
+    },
+    "trust_boundaries": {
+      "total": 4,
+      "items": [
+        {"id": "tb-001", "name": "Public Internet to API", "type": "network"},
+        {"id": "tb-002", "name": "API to Database", "type": "network"},
+        {"id": "tb-003", "name": "API to External Services", "type": "organizational"},
+        {"id": "tb-004", "name": "Authentication Boundary", "type": "privilege"}
+      ]
+    },
+    "attack_surface": {
+      "total": 8,
+      "by_exposure": {
+        "public": 3,
+        "internal": 5
+      }
+    },
+    "threats": {
+      "total": 15,
+      "by_severity": {
+        "critical": 4,
+        "high": 7,
+        "medium": 4,
+        "low": 0
+      }
+    },
+    "controls": {
+      "total": 15,
+      "by_status": {
+        "implemented": 5,
+        "partial": 3,
+        "missing": 7
+      }
+    },
+    "gaps": {
+      "total": 10,
+      "by_severity": {
+        "critical": 3,
+        "high": 5,
+        "medium": 2
+      }
+    },
+    "compliance": {
+      "owasp": 52,
+      "soc2": 48
+    }
+  },
+  "metadata": {
+    "commit": null,
+    "author": "threat-modeling-toolkit",
+    "reason": "Initial baseline - first threat model analysis"
+  }
+}

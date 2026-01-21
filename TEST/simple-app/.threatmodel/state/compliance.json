@@ -1,0 +1,290 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T13:05:00Z",
+  "frameworks": [
+    {
+      "name": "OWASP Top 10 2021",
+      "version": "2021",
+      "overall_compliance": 52,
+      "mappings": [
+        {
+          "requirement_id": "A01:2021",
+          "requirement_name": "Broken Access Control",
+          "description": "Restrictions on authenticated users not properly enforced, allowing unauthorized access to resources",
+          "stride_categories": ["elevation-of-privilege", "information-disclosure"],
+          "related_threats": ["threat-003", "threat-004"],
+          "related_controls": ["control-007", "control-010"],
+          "status": "non-compliant",
+          "coverage": 15,
+          "gaps": ["gap-001", "gap-002"],
+          "evidence": [
+            "PARTIAL: User-scoped queries for GET /tasks (control-007)",
+            "MISSING: Object-level authorization on PUT/DELETE (gap-001, gap-002)"
+          ],
+          "remediation_priority": "critical"
+        },
+        {
+          "requirement_id": "A02:2021",
+          "requirement_name": "Cryptographic Failures",
+          "description": "Failures related to cryptography leading to sensitive data exposure",
+          "stride_categories": ["information-disclosure"],
+          "related_threats": ["threat-008"],
+          "related_controls": ["control-001", "control-005"],
+          "status": "compliant",
+          "coverage": 90,
+          "gaps": [],
+          "evidence": [
+            "IMPLEMENTED: bcrypt password hashing with cost 10 (control-001)",
+            "IMPLEMENTED: Secure reset tokens with crypto.randomBytes(32) (control-005)",
+            "IMPLEMENTED: JWT signing (though HS256 could upgrade to RS256)"
+          ],
+          "remediation_priority": "low"
+        },
+        {
+          "requirement_id": "A03:2021",
+          "requirement_name": "Injection",
+          "description": "User-supplied data not validated, filtered, or sanitized allowing injection attacks",
+          "stride_categories": ["tampering"],
+          "related_threats": ["threat-009"],
+          "related_controls": ["control-004", "control-008"],
+          "status": "partial",
+          "coverage": 70,
+          "gaps": ["gap-010"],
+          "evidence": [
+            "IMPLEMENTED: Parameterized SQL queries (control-004)",
+            "PARTIAL: Basic input validation, no schema (control-008, gap-010)"
+          ],
+          "remediation_priority": "medium"
+        },
+        {
+          "requirement_id": "A04:2021",
+          "requirement_name": "Insecure Design",
+          "description": "Missing or ineffective control design, failure to threat model",
+          "stride_categories": ["elevation-of-privilege", "tampering"],
+          "related_threats": ["threat-005", "threat-013"],
+          "related_controls": ["control-011", "control-012"],
+          "status": "non-compliant",
+          "coverage": 0,
+          "gaps": ["gap-004", "gap-005"],
+          "evidence": [
+            "MISSING: No CSRF protection (gap-005)",
+            "MISSING: No MFA design (gap-004)",
+            "NOTE: Threat model being created addresses this going forward"
+          ],
+          "remediation_priority": "high"
+        },
+        {
+          "requirement_id": "A05:2021",
+          "requirement_name": "Security Misconfiguration",
+          "description": "Missing appropriate security hardening or improperly configured permissions",
+          "stride_categories": ["denial-of-service", "information-disclosure"],
+          "related_threats": ["threat-002"],
+          "related_controls": ["control-003", "control-009"],
+          "status": "partial",
+          "coverage": 50,
+          "gaps": ["gap-003"],
+          "evidence": [
+            "IMPLEMENTED: Rate limiting on login (control-003)",
+            "MISSING: Rate limiting on forgot-password (gap-003)"
+          ],
+          "remediation_priority": "high"
+        },
+        {
+          "requirement_id": "A06:2021",
+          "requirement_name": "Vulnerable and Outdated Components",
+          "description": "Using components with known vulnerabilities",
+          "stride_categories": [],
+          "related_threats": [],
+          "related_controls": [],
+          "status": "unknown",
+          "coverage": null,
+          "gaps": [],
+          "evidence": [
+            "NOT ASSESSED: Requires npm audit / dependency scanning",
+            "RECOMMENDATION: Run npm audit and review package-lock.json"
+          ],
+          "remediation_priority": "medium"
+        },
+        {
+          "requirement_id": "A07:2021",
+          "requirement_name": "Identification and Authentication Failures",
+          "description": "Confirmation of user identity, authentication, and session management weaknesses",
+          "stride_categories": ["spoofing"],
+          "related_threats": ["threat-001", "threat-006", "threat-007", "threat-011", "threat-013", "threat-014"],
+          "related_controls": ["control-001", "control-002", "control-003", "control-012", "control-014", "control-015"],
+          "status": "partial",
+          "coverage": 45,
+          "gaps": ["gap-004", "gap-007", "gap-008"],
+          "evidence": [
+            "IMPLEMENTED: Password hashing (control-001)",
+            "IMPLEMENTED: JWT authentication (control-002)",
+            "IMPLEMENTED: Login rate limiting (control-003)",
+            "MISSING: MFA (gap-004)",
+            "MISSING: Account lockout (gap-007)",
+            "MISSING: Password policy (gap-008)"
+          ],
+          "remediation_priority": "critical"
+        },
+        {
+          "requirement_id": "A08:2021",
+          "requirement_name": "Software and Data Integrity Failures",
+          "description": "Code and infrastructure not protecting against integrity violations",
+          "stride_categories": ["tampering"],
+          "related_threats": ["threat-005"],
+          "related_controls": ["control-011"],
+          "status": "non-compliant",
+          "coverage": 0,
+          "gaps": ["gap-005"],
+          "evidence": [
+            "MISSING: CSRF protection (gap-005)",
+            "NOT ASSESSED: CI/CD pipeline security"
+          ],
+          "remediation_priority": "medium"
+        },
+        {
+          "requirement_id": "A09:2021",
+          "requirement_name": "Security Logging and Monitoring Failures",
+          "description": "Insufficient logging, detection, monitoring, and active response",
+          "stride_categories": ["repudiation"],
+          "related_threats": ["threat-010"],
+          "related_controls": ["control-013"],
+          "status": "non-compliant",
+          "coverage": 0,
+          "gaps": ["gap-006"],
+          "evidence": [
+            "MISSING: Security event logging (gap-006)",
+            "MISSING: Monitoring and alerting infrastructure"
+          ],
+          "remediation_priority": "high"
+        },
+        {
+          "requirement_id": "A10:2021",
+          "requirement_name": "Server-Side Request Forgery (SSRF)",
+          "description": "Fetching a remote resource without validating the user-supplied URL",
+          "stride_categories": ["tampering"],
+          "related_threats": [],
+          "related_controls": [],
+          "status": "not-applicable",
+          "coverage": null,
+          "gaps": [],
+          "evidence": [
+            "NOT APPLICABLE: No server-side URL fetching functionality identified"
+          ],
+          "remediation_priority": null
+        }
+      ]
+    },
+    {
+      "name": "SOC2 Trust Services Criteria",
+      "version": "2017",
+      "overall_compliance": 48,
+      "mappings": [
+        {
+          "requirement_id": "CC6.1",
+          "requirement_name": "Logical and Physical Access Controls",
+          "description": "The entity implements logical access security software, infrastructure, and architectures over protected information assets",
+          "stride_categories": ["spoofing", "elevation-of-privilege"],
+          "related_threats": ["threat-001", "threat-003", "threat-004", "threat-006"],
+          "related_controls": ["control-002", "control-007", "control-010"],
+          "status": "partial",
+          "coverage": 40,
+          "gaps": ["gap-001", "gap-002"],
+          "evidence": [
+            "IMPLEMENTED: JWT-based access control (control-002)",
+            "PARTIAL: User-scoped queries only for GET (control-007)",
+            "MISSING: Object-level authorization (gap-001, gap-002)"
+          ]
+        },
+        {
+          "requirement_id": "CC6.2",
+          "requirement_name": "System Access Authentication",
+          "description": "Prior to issuing system credentials, the entity registers and authorizes new users",
+          "stride_categories": ["spoofing"],
+          "related_threats": ["threat-001", "threat-007", "threat-011", "threat-013"],
+          "related_controls": ["control-001", "control-003", "control-012", "control-014", "control-015"],
+          "status": "partial",
+          "coverage": 35,
+          "gaps": ["gap-004", "gap-007", "gap-008"],
+          "evidence": [
+            "IMPLEMENTED: Password hashing (control-001)",
+            "IMPLEMENTED: Rate limiting (control-003)",
+            "MISSING: MFA (gap-004)",
+            "MISSING: Account lockout (gap-007)",
+            "MISSING: Password policy (gap-008)"
+          ]
+        },
+        {
+          "requirement_id": "CC6.3",
+          "requirement_name": "Access Restriction and Privileges",
+          "description": "The entity authorizes, modifies, or removes access based on roles and responsibilities",
+          "stride_categories": ["elevation-of-privilege"],
+          "related_threats": ["threat-003", "threat-004"],
+          "related_controls": ["control-007", "control-010"],
+          "status": "non-compliant",
+          "coverage": 20,
+          "gaps": ["gap-001", "gap-002"],
+          "evidence": [
+            "PARTIAL: Basic authentication check",
+            "MISSING: Role-based access control",
+            "MISSING: Object-level authorization"
+          ]
+        },
+        {
+          "requirement_id": "CC6.6",
+          "requirement_name": "System Boundaries",
+          "description": "The entity implements controls to prevent or detect and act upon the introduction of unauthorized code",
+          "stride_categories": ["tampering"],
+          "related_threats": ["threat-009"],
+          "related_controls": ["control-004", "control-008"],
+          "status": "partial",
+          "coverage": 70,
+          "gaps": ["gap-010"],
+          "evidence": [
+            "IMPLEMENTED: Parameterized queries (control-004)",
+            "PARTIAL: Input validation (control-008)"
+          ]
+        },
+        {
+          "requirement_id": "CC6.7",
+          "requirement_name": "Transmission Integrity",
+          "description": "The entity uses encryption to protect data in transit",
+          "stride_categories": ["information-disclosure", "tampering"],
+          "related_threats": [],
+          "related_controls": [],
+          "status": "compliant",
+          "coverage": 100,
+          "gaps": [],
+          "evidence": [
+            "IMPLEMENTED: HTTPS for all communications (documented in architecture)",
+            "IMPLEMENTED: PostgreSQL TLS connection"
+          ]
+        },
+        {
+          "requirement_id": "CC7.2",
+          "requirement_name": "Change Management",
+          "description": "The entity identifies, evaluates, and records changes to system components",
+          "stride_categories": ["repudiation"],
+          "related_threats": ["threat-010"],
+          "related_controls": ["control-013"],
+          "status": "non-compliant",
+          "coverage": 0,
+          "gaps": ["gap-006"],
+          "evidence": [
+            "MISSING: Audit logging (gap-006)",
+            "NOT ASSESSED: Version control and deployment practices"
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "frameworks_analyzed": 2,
+    "overall_compliance": 50,
+    "total_requirements": 16,
+    "compliant": 2,
+    "partial": 7,
+    "non_compliant": 5,
+    "not_applicable": 1,
+    "unknown": 1
+  }
+}

@@ -126,6 +126,66 @@ Search patterns:
 
 ## Output Files
 
+### verification-report.md (Visual Report)
+```markdown
+# Control Verification Report
+
+**Generated**: [Date]
+**Code Paths Analyzed**: [Paths]
+
+## Summary
+
+```
+VERIFICATION RESULTS
+═══════════════════════════════════════════════════════════
+
+Controls Analyzed: 29
+
+STATUS BREAKDOWN
+─────────────────────────────────────────────────────────
+✓ Implemented │████████████████████████████████████░░░░│ 18 (62%)
+⚠ Partial     │██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░│  7 (24%)
+✗ Missing     │████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  4 (14%)
+
+GAPS BY SEVERITY
+─────────────────────────────────────────────────────────
+CRITICAL │████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  2
+    HIGH │████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  4
+  MEDIUM │██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  3
+     LOW │████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  2
+```
+
+## Verified Controls
+
+| Control | Status | Evidence |
+|---------|--------|----------|
+| Rate Limiting | ✓ Implemented | `src/middleware/rateLimiter.ts:15` |
+| JWT Auth | ✓ Implemented | `src/middleware/auth.ts:23` |
+| Input Validation | ⚠ Partial | `src/validators/` (missing on 3 routes) |
+| MFA | ✗ Missing | No implementation found |
+
+## Gap Details
+
+### GAP-001: MFA Not Enforced (HIGH)
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ EXPECTED: MFA required for all admin accounts           │
+│ ACTUAL:   MFA optional, no enforcement check found      │
+│                                                         │
+│ EVIDENCE:                                               │
+│   Searched: mfa, totp, 2fa, two-factor                  │
+│   Found:    No matches in auth middleware               │
+│                                                         │
+│ REMEDIATION:                                            │
+│   Add MFA verification in admin route middleware        │
+│   Effort: Medium | Priority: High                       │
+└─────────────────────────────────────────────────────────┘
+```
+
+[Additional gaps...]
+```
+
 ### controls.json
 ```json
 {
@@ -252,7 +312,13 @@ When executing this skill:
    - Assess severity
    - Recommend remediation
 
-7. **Report summary**:
+7. **Write visual report file** (`.threatmodel/reports/verification-report.md`):
+   - Include ASCII progress bars for status breakdown
+   - Include visual gap boxes with evidence
+   - Use `✓`, `⚠`, `✗` symbols
+   - This file should contain ALL the visual elements, not just JSON
+
+8. **Console summary** (also display to user):
    ```
    Control Verification Complete
    =============================

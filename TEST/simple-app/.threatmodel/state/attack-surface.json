@@ -1,0 +1,103 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T12:50:00Z",
+  "attack_surface": [
+    {
+      "id": "as-001",
+      "name": "User Registration Endpoint",
+      "type": "api",
+      "endpoint": "POST /api/auth/register",
+      "exposure": "public",
+      "authentication": "none",
+      "asset_id": "asset-002",
+      "data_accepted": ["email", "password", "name"],
+      "controls": ["Input validation (basic)", "Password hashing (bcrypt)"],
+      "code_reference": "src/routes/auth.js:10"
+    },
+    {
+      "id": "as-002",
+      "name": "Login Endpoint",
+      "type": "api",
+      "endpoint": "POST /api/auth/login",
+      "exposure": "public",
+      "authentication": "none",
+      "asset_id": "asset-002",
+      "data_accepted": ["email", "password"],
+      "controls": ["Rate limiting (5 req/15min)", "Password verification"],
+      "code_reference": "src/routes/auth.js:38"
+    },
+    {
+      "id": "as-003",
+      "name": "Forgot Password Endpoint",
+      "type": "api",
+      "endpoint": "POST /api/auth/forgot-password",
+      "exposure": "public",
+      "authentication": "none",
+      "asset_id": "asset-002",
+      "data_accepted": ["email"],
+      "controls": ["User enumeration prevention"],
+      "gaps": ["No rate limiting"],
+      "code_reference": "src/routes/auth.js:71"
+    },
+    {
+      "id": "as-004",
+      "name": "List Tasks Endpoint",
+      "type": "api",
+      "endpoint": "GET /api/tasks",
+      "exposure": "internal",
+      "authentication": "jwt",
+      "asset_id": "asset-002",
+      "data_returned": ["task-data"],
+      "controls": ["JWT authentication", "User-scoped query"],
+      "code_reference": "src/routes/tasks.js:11"
+    },
+    {
+      "id": "as-005",
+      "name": "Create Task Endpoint",
+      "type": "api",
+      "endpoint": "POST /api/tasks",
+      "exposure": "internal",
+      "authentication": "jwt",
+      "asset_id": "asset-002",
+      "data_accepted": ["title", "description", "dueDate", "assigneeId"],
+      "controls": ["JWT authentication", "Input validation (basic)"],
+      "code_reference": "src/routes/tasks.js:24"
+    },
+    {
+      "id": "as-006",
+      "name": "Update Task Endpoint",
+      "type": "api",
+      "endpoint": "PUT /api/tasks/:id",
+      "exposure": "internal",
+      "authentication": "jwt",
+      "asset_id": "asset-002",
+      "data_accepted": ["title", "description", "status", "dueDate"],
+      "controls": ["JWT authentication"],
+      "gaps": ["Missing object-level authorization (BOLA)"],
+      "code_reference": "src/routes/tasks.js:44"
+    },
+    {
+      "id": "as-007",
+      "name": "Delete Task Endpoint",
+      "type": "api",
+      "endpoint": "DELETE /api/tasks/:id",
+      "exposure": "internal",
+      "authentication": "jwt",
+      "asset_id": "asset-002",
+      "controls": ["JWT authentication"],
+      "gaps": ["Missing object-level authorization (BOLA)"],
+      "code_reference": "src/routes/tasks.js:67"
+    },
+    {
+      "id": "as-008",
+      "name": "React Web Application",
+      "type": "web-ui",
+      "endpoint": "https://taskflow.vercel.app",
+      "exposure": "public",
+      "authentication": "session-based",
+      "asset_id": "asset-001",
+      "controls": ["HTTPS"],
+      "gaps": ["No CSRF protection mentioned"]
+    }
+  ]
+}

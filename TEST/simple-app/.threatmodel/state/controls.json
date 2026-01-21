@@ -1,0 +1,449 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T13:00:00Z",
+  "controls": [
+    {
+      "id": "control-001",
+      "name": "Password Hashing with bcrypt",
+      "type": "preventive",
+      "category": "authentication",
+      "description": "User passwords are hashed using bcrypt with cost factor 10 before storage",
+      "threats_mitigated": ["threat-007", "threat-001"],
+      "implementation": {
+        "status": "implemented",
+        "method": "bcrypt.hash() with salt rounds 10",
+        "configuration": {
+          "algorithm": "bcrypt",
+          "saltRounds": 10
+        }
+      },
+      "verification": {
+        "status": "verified",
+        "evidence": [
+          {
+            "type": "code",
+            "location": "src/routes/auth.js:20",
+            "snippet": "const hashedPassword = await bcrypt.hash(password, 10);",
+            "verified_at": "2026-01-20T13:00:00Z"
+          },
+          {
+            "type": "code",
+            "location": "src/routes/auth.js:52",
+            "snippet": "const validPassword = await bcrypt.compare(password, user.password_hash);",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0.9
+    },
+    {
+      "id": "control-002",
+      "name": "JWT Authentication Middleware",
+      "type": "preventive",
+      "category": "authentication",
+      "description": "JWT tokens are verified on protected routes using jsonwebtoken library",
+      "threats_mitigated": ["threat-006"],
+      "implementation": {
+        "status": "implemented",
+        "method": "Express middleware with jwt.verify()",
+        "configuration": {
+          "algorithm": "HS256",
+          "expiresIn": "24h"
+        }
+      },
+      "verification": {
+        "status": "verified",
+        "evidence": [
+          {
+            "type": "code",
+            "location": "src/middleware/auth.js:16",
+            "snippet": "const decoded = jwt.verify(token, JWT_SECRET);",
+            "verified_at": "2026-01-20T13:00:00Z"
+          },
+          {
+            "type": "code",
+            "location": "src/routes/tasks.js:8",
+            "snippet": "router.use(authenticate);",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0.8
+    },
+    {
+      "id": "control-003",
+      "name": "Rate Limiting on Login Endpoint",
+      "type": "preventive",
+      "category": "authentication",
+      "description": "Login endpoint limited to 5 requests per 15 minutes using express-rate-limit",
+      "threats_mitigated": ["threat-001", "threat-007"],
+      "implementation": {
+        "status": "implemented",
+        "method": "express-rate-limit middleware",
+        "configuration": {
+          "windowMs": 900000,
+          "max": 5,
+          "standardHeaders": true
+        }
+      },
+      "verification": {
+        "status": "verified",
+        "evidence": [
+          {
+            "type": "code",
+            "location": "src/middleware/rateLimiter.js:4-10",
+            "snippet": "const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });",
+            "verified_at": "2026-01-20T13:00:00Z"
+          },
+          {
+            "type": "code",
+            "location": "src/routes/auth.js:38",
+            "snippet": "router.post('/login', loginLimiter, async (req, res) => {",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0.7,
+      "notes": "Only applied to login, not forgot-password"
+    },
+    {
+      "id": "control-004",
+      "name": "Parameterized SQL Queries",
+      "type": "preventive",
+      "category": "injection",
+      "description": "All SQL queries use parameterized statements ($1, $2, etc.) preventing SQL injection",
+      "threats_mitigated": ["threat-009"],
+      "implementation": {
+        "status": "implemented",
+        "method": "PostgreSQL parameterized queries via pg library",
+        "configuration": {}
+      },
+      "verification": {
+        "status": "verified",
+        "evidence": [
+          {
+            "type": "code",
+            "location": "src/routes/auth.js:24",
+            "snippet": "VALUES ($1, $2, $3) RETURNING id, email, name",
+            "verified_at": "2026-01-20T13:00:00Z"
+          },
+          {
+            "type": "code",
+            "location": "src/routes/tasks.js:14",
+            "snippet": "WHERE user_id = $1 ORDER BY created_at DESC",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0.95
+    },
+    {
+      "id": "control-005",
+      "name": "Secure Password Reset Token",
+      "type": "preventive",
+      "category": "authentication",
+      "description": "Password reset tokens generated using crypto.randomBytes(32) with 1 hour expiration",
+      "threats_mitigated": ["threat-014"],
+      "implementation": {
+        "status": "implemented",
+        "method": "crypto.randomBytes() with database expiration",
+        "configuration": {
+          "tokenLength": 32,
+          "expiresIn": "1 hour"
+        }
+      },
+      "verification": {
+        "status": "verified",
+        "evidence": [
+          {
+            "type": "code",
+            "location": "src/routes/auth.js:76",
+            "snippet": "const resetToken = require('crypto').randomBytes(32).toString('hex')",
+            "verified_at": "2026-01-20T13:00:00Z"
+          },
+          {
+            "type": "code",
+            "location": "src/routes/auth.js:80",
+            "snippet": "reset_token_expires = NOW() + INTERVAL '1 hour'",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0.85
+    },
+    {
+      "id": "control-006",
+      "name": "User Enumeration Prevention",
+      "type": "preventive",
+      "category": "information-disclosure",
+      "description": "Forgot password endpoint returns generic message regardless of email existence",
+      "threats_mitigated": ["threat-012"],
+      "implementation": {
+        "status": "partial",
+        "method": "Generic response message",
+        "configuration": {}
+      },
+      "verification": {
+        "status": "verified",
+        "evidence": [
+          {
+            "type": "code",
+            "location": "src/routes/auth.js:88",
+            "snippet": "res.json({ message: 'If the email exists, a reset link has been sent' });",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0.5,
+      "notes": "Registration endpoint still exposes 'Email already exists' error"
+    },
+    {
+      "id": "control-007",
+      "name": "User-Scoped Task Queries",
+      "type": "preventive",
+      "category": "authorization",
+      "description": "GET /tasks filters results by authenticated user's ID",
+      "threats_mitigated": [],
+      "implementation": {
+        "status": "partial",
+        "method": "SQL WHERE clause with user_id",
+        "configuration": {}
+      },
+      "verification": {
+        "status": "verified",
+        "evidence": [
+          {
+            "type": "code",
+            "location": "src/routes/tasks.js:14",
+            "snippet": "SELECT * FROM tasks WHERE user_id = $1",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0.3,
+      "notes": "Only implemented for GET, missing for PUT/DELETE"
+    },
+    {
+      "id": "control-008",
+      "name": "Basic Input Presence Validation",
+      "type": "preventive",
+      "category": "input-validation",
+      "description": "Basic checks for required fields presence",
+      "threats_mitigated": [],
+      "implementation": {
+        "status": "partial",
+        "method": "Manual if statements",
+        "configuration": {}
+      },
+      "verification": {
+        "status": "verified",
+        "evidence": [
+          {
+            "type": "code",
+            "location": "src/routes/auth.js:14",
+            "snippet": "if (!email || !password || !name)",
+            "verified_at": "2026-01-20T13:00:00Z"
+          },
+          {
+            "type": "code",
+            "location": "src/routes/tasks.js:27",
+            "snippet": "if (!title)",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0.3,
+      "notes": "No schema validation, no sanitization, no type checking"
+    },
+    {
+      "id": "control-009",
+      "name": "Rate Limiting on Forgot Password",
+      "type": "preventive",
+      "category": "availability",
+      "description": "Rate limiting to prevent password reset flood attacks",
+      "threats_mitigated": ["threat-002"],
+      "implementation": {
+        "status": "missing",
+        "method": null,
+        "configuration": {}
+      },
+      "verification": {
+        "status": "failed",
+        "evidence": [
+          {
+            "type": "code_search",
+            "search_pattern": "loginLimiter|rateLimiter.*forgot",
+            "result": "No rate limiter applied to forgot-password route",
+            "location": "src/routes/auth.js:71",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0
+    },
+    {
+      "id": "control-010",
+      "name": "Object-Level Authorization (BOLA)",
+      "type": "preventive",
+      "category": "authorization",
+      "description": "Verify resource ownership before modification/deletion",
+      "threats_mitigated": ["threat-003", "threat-004"],
+      "implementation": {
+        "status": "missing",
+        "method": null,
+        "configuration": {}
+      },
+      "verification": {
+        "status": "failed",
+        "evidence": [
+          {
+            "type": "code",
+            "location": "src/routes/tasks.js:49-52",
+            "snippet": "// BUG: Should check if user owns this task!",
+            "note": "Comment in code acknowledges missing check",
+            "verified_at": "2026-01-20T13:00:00Z"
+          },
+          {
+            "type": "code",
+            "location": "src/routes/tasks.js:71",
+            "snippet": "// BUG: Should check if user owns this task!",
+            "note": "Same issue on DELETE route",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0
+    },
+    {
+      "id": "control-011",
+      "name": "CSRF Protection",
+      "type": "preventive",
+      "category": "input-validation",
+      "description": "Cross-Site Request Forgery token validation",
+      "threats_mitigated": ["threat-005"],
+      "implementation": {
+        "status": "missing",
+        "method": null,
+        "configuration": {}
+      },
+      "verification": {
+        "status": "failed",
+        "evidence": [
+          {
+            "type": "code_search",
+            "search_pattern": "csrf|xsrf|CSRF",
+            "result": "No matches found in codebase",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0
+    },
+    {
+      "id": "control-012",
+      "name": "Multi-Factor Authentication",
+      "type": "preventive",
+      "category": "authentication",
+      "description": "Secondary authentication factor (TOTP, SMS, etc.)",
+      "threats_mitigated": ["threat-001", "threat-013"],
+      "implementation": {
+        "status": "missing",
+        "method": null,
+        "configuration": {}
+      },
+      "verification": {
+        "status": "failed",
+        "evidence": [
+          {
+            "type": "code_search",
+            "search_pattern": "mfa|totp|2fa|two-factor",
+            "result": "No matches found in codebase",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0
+    },
+    {
+      "id": "control-013",
+      "name": "Security Event Logging",
+      "type": "detective",
+      "category": "logging",
+      "description": "Audit logging for security-relevant events",
+      "threats_mitigated": ["threat-010"],
+      "implementation": {
+        "status": "missing",
+        "method": null,
+        "configuration": {}
+      },
+      "verification": {
+        "status": "failed",
+        "evidence": [
+          {
+            "type": "code_search",
+            "search_pattern": "log|logger|winston|bunyan|pino|audit",
+            "result": "No logging library or audit trail found",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0
+    },
+    {
+      "id": "control-014",
+      "name": "Account Lockout",
+      "type": "preventive",
+      "category": "authentication",
+      "description": "Lock account after repeated failed login attempts",
+      "threats_mitigated": ["threat-007"],
+      "implementation": {
+        "status": "missing",
+        "method": null,
+        "configuration": {}
+      },
+      "verification": {
+        "status": "failed",
+        "evidence": [
+          {
+            "type": "code_search",
+            "search_pattern": "lockout|locked|attempts|failed.*count",
+            "result": "No account lockout mechanism found",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0
+    },
+    {
+      "id": "control-015",
+      "name": "Password Strength Enforcement",
+      "type": "preventive",
+      "category": "authentication",
+      "description": "Enforce minimum password complexity requirements",
+      "threats_mitigated": ["threat-011"],
+      "implementation": {
+        "status": "missing",
+        "method": null,
+        "configuration": {}
+      },
+      "verification": {
+        "status": "failed",
+        "evidence": [
+          {
+            "type": "code_search",
+            "search_pattern": "password.*length|strength|complexity|zxcvbn",
+            "result": "No password policy enforcement found",
+            "verified_at": "2026-01-20T13:00:00Z"
+          }
+        ]
+      },
+      "effectiveness": 0
+    }
+  ],
+  "summary": {
+    "total": 15,
+    "implemented": 5,
+    "partial": 3,
+    "missing": 7
+  }
+}

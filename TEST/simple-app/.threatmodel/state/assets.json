@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T12:50:00Z",
+  "assets": [
+    {
+      "id": "asset-001",
+      "name": "React Frontend",
+      "type": "client",
+      "classification": "public",
+      "description": "React (Vite) single-page application hosted on Vercel",
+      "owner": "frontend-team",
+      "data_types": ["user-input", "session-tokens"],
+      "code_references": [],
+      "hosting": "Vercel"
+    },
+    {
+      "id": "asset-002",
+      "name": "Express API",
+      "type": "service",
+      "classification": "internal",
+      "description": "Node.js Express REST API server hosted on Railway",
+      "owner": "backend-team",
+      "data_types": ["user-data", "task-data", "credentials"],
+      "code_references": ["src/routes/auth.js", "src/routes/tasks.js"],
+      "hosting": "Railway"
+    },
+    {
+      "id": "asset-003",
+      "name": "PostgreSQL Database",
+      "type": "data-store",
+      "classification": "restricted",
+      "description": "PostgreSQL database storing user accounts and task data",
+      "owner": "platform-team",
+      "data_types": ["pii", "credentials", "task-data"],
+      "code_references": ["src/db"],
+      "hosting": "Railway"
+    },
+    {
+      "id": "asset-004",
+      "name": "JWT Authentication",
+      "type": "identity",
+      "classification": "confidential",
+      "description": "JWT-based authentication system using HS256",
+      "owner": "backend-team",
+      "data_types": ["tokens", "user-identity"],
+      "code_references": ["src/middleware/auth.js"],
+      "secrets": ["JWT_SECRET"]
+    },
+    {
+      "id": "asset-005",
+      "name": "SendGrid Integration",
+      "type": "integration",
+      "classification": "internal",
+      "description": "Email service for password reset and notifications",
+      "owner": "backend-team",
+      "data_types": ["email-addresses", "reset-tokens"],
+      "code_references": ["src/routes/auth.js:84"],
+      "secrets": ["SENDGRID_API_KEY"]
+    }
+  ]
+}

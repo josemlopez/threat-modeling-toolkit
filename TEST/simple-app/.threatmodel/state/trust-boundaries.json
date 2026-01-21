@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T12:50:00Z",
+  "trust_boundaries": [
+    {
+      "id": "tb-001",
+      "name": "Public Internet to API",
+      "type": "network",
+      "description": "Boundary between public internet (React app) and internal API",
+      "from_zone": "public",
+      "to_zone": "internal",
+      "controls": ["HTTPS/TLS", "JWT Authentication", "Rate Limiting (partial)"]
+    },
+    {
+      "id": "tb-002",
+      "name": "API to Database",
+      "type": "network",
+      "description": "Boundary between API server and database",
+      "from_zone": "internal",
+      "to_zone": "restricted",
+      "controls": ["TLS Connection", "Database Credentials", "Parameterized Queries"]
+    },
+    {
+      "id": "tb-003",
+      "name": "API to External Services",
+      "type": "organizational",
+      "description": "Boundary between internal API and third-party services (SendGrid)",
+      "from_zone": "internal",
+      "to_zone": "external",
+      "controls": ["API Keys", "HTTPS"]
+    },
+    {
+      "id": "tb-004",
+      "name": "Authentication Boundary",
+      "type": "privilege",
+      "description": "Boundary between unauthenticated and authenticated access",
+      "from_zone": "unauthenticated",
+      "to_zone": "authenticated",
+      "controls": ["JWT Verification", "Token Expiration"]
+    }
+  ]
+}

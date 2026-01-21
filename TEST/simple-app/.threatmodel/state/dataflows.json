@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T12:50:00Z",
+  "dataflows": [
+    {
+      "id": "flow-001",
+      "name": "User Authentication",
+      "source": {"asset_id": "asset-001", "component": "LoginForm"},
+      "destination": {"asset_id": "asset-002", "component": "AuthRoutes"},
+      "data_types": ["credentials"],
+      "protocol": "HTTPS",
+      "encryption": {"in_transit": true},
+      "crosses_trust_boundary": true,
+      "trust_boundary_id": "tb-001"
+    },
+    {
+      "id": "flow-002",
+      "name": "JWT Token Response",
+      "source": {"asset_id": "asset-002", "component": "AuthRoutes"},
+      "destination": {"asset_id": "asset-001", "component": "TokenStorage"},
+      "data_types": ["jwt-token"],
+      "protocol": "HTTPS",
+      "encryption": {"in_transit": true},
+      "crosses_trust_boundary": true,
+      "trust_boundary_id": "tb-001"
+    },
+    {
+      "id": "flow-003",
+      "name": "User Registration",
+      "source": {"asset_id": "asset-001", "component": "RegisterForm"},
+      "destination": {"asset_id": "asset-002", "component": "AuthRoutes"},
+      "data_types": ["pii", "credentials"],
+      "protocol": "HTTPS",
+      "encryption": {"in_transit": true},
+      "crosses_trust_boundary": true,
+      "trust_boundary_id": "tb-001"
+    },
+    {
+      "id": "flow-004",
+      "name": "Database User Query",
+      "source": {"asset_id": "asset-002", "component": "AuthRoutes"},
+      "destination": {"asset_id": "asset-003", "component": "UsersTable"},
+      "data_types": ["credentials", "pii"],
+      "protocol": "PostgreSQL/TLS",
+      "encryption": {"in_transit": true, "at_rest": true},
+      "crosses_trust_boundary": true,
+      "trust_boundary_id": "tb-002"
+    },
+    {
+      "id": "flow-005",
+      "name": "Task CRUD Operations",
+      "source": {"asset_id": "asset-001", "component": "TaskManager"},
+      "destination": {"asset_id": "asset-002", "component": "TaskRoutes"},
+      "data_types": ["task-data", "jwt-token"],
+      "protocol": "HTTPS",
+      "encryption": {"in_transit": true},
+      "crosses_trust_boundary": true,
+      "trust_boundary_id": "tb-001"
+    },
+    {
+      "id": "flow-006",
+      "name": "Database Task Query",
+      "source": {"asset_id": "asset-002", "component": "TaskRoutes"},
+      "destination": {"asset_id": "asset-003", "component": "TasksTable"},
+      "data_types": ["task-data"],
+      "protocol": "PostgreSQL/TLS",
+      "encryption": {"in_transit": true, "at_rest": true},
+      "crosses_trust_boundary": true,
+      "trust_boundary_id": "tb-002"
+    },
+    {
+      "id": "flow-007",
+      "name": "Password Reset Request",
+      "source": {"asset_id": "asset-001", "component": "ForgotPasswordForm"},
+      "destination": {"asset_id": "asset-002", "component": "AuthRoutes"},
+      "data_types": ["email-address"],
+      "protocol": "HTTPS",
+      "encryption": {"in_transit": true},
+      "crosses_trust_boundary": true,
+      "trust_boundary_id": "tb-001"
+    },
+    {
+      "id": "flow-008",
+      "name": "Password Reset Email",
+      "source": {"asset_id": "asset-002", "component": "AuthRoutes"},
+      "destination": {"asset_id": "asset-005", "component": "SendGridAPI"},
+      "data_types": ["email-address", "reset-token"],
+      "protocol": "HTTPS",
+      "encryption": {"in_transit": true},
+      "crosses_trust_boundary": true,
+      "trust_boundary_id": "tb-003"
+    }
+  ]
+}

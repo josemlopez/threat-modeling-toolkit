@@ -260,7 +260,72 @@ When executing this skill:
    - Group by category
    - Assign treatment strategy
 
-7. **Report summary**:
+7. **Write visual threat report** (`.threatmodel/reports/threat-report.md`):
+   ```markdown
+   # Threat Analysis Report
+
+   **Generated**: [Date]
+   **Framework**: STRIDE
+
+   ## Summary
+
+   ```
+   THREAT ANALYSIS
+   ═══════════════════════════════════════════════════════════
+
+   Assets Analyzed: 14
+   Attack Surfaces Analyzed: 12
+
+   THREATS BY SEVERITY
+   ─────────────────────────────────────────────────────────
+   CRITICAL │██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  5  (11%)
+       HIGH │████████████████████████░░░░░░░░░░░░░░░░│ 12  (26%)
+     MEDIUM │████████████████████████████████████░░░░│ 18  (38%)
+        LOW │████████████████████████░░░░░░░░░░░░░░░░│ 12  (26%)
+
+   THREATS BY STRIDE CATEGORY
+   ─────────────────────────────────────────────────────────
+   Spoofing              │████████████████░░░░░░░░░░░░░░░░│  8
+   Tampering             │████████████████████░░░░░░░░░░░░│ 10
+   Repudiation           │████████░░░░░░░░░░░░░░░░░░░░░░░░│  4
+   Information Disclosure│██████████████████░░░░░░░░░░░░░░│  9
+   Denial of Service     │██████████████░░░░░░░░░░░░░░░░░░│  7
+   Elevation of Privilege│██████████████████░░░░░░░░░░░░░░│  9
+   ```
+
+   ## Critical Threats
+
+   ### THREAT-001: Credential Stuffing Attack
+
+   ```
+   ┌─────────────────────────────────────────────────────────┐
+   │ RISK SCORE: 8.5/10 (CRITICAL)                           │
+   ├─────────────────────────────────────────────────────────┤
+   │ Category: Spoofing                                      │
+   │ Target:   POST /api/auth/login                          │
+   │                                                         │
+   │ ATTACK VECTOR:                                          │
+   │   Automated login attempts with leaked credentials      │
+   │                                                         │
+   │ IMPACT:                                                 │
+   │   Confidentiality: HIGH                                 │
+   │   Integrity: MEDIUM                                     │
+   │   Availability: LOW                                     │
+   │                                                         │
+   │ MITRE ATT&CK: T1110.001                                 │
+   │ CWE: CWE-307                                            │
+   │                                                         │
+   │ REQUIRED COUNTERMEASURES:                               │
+   │   • Rate limiting on auth endpoints                     │
+   │   • Account lockout after failed attempts               │
+   │   • MFA enforcement                                     │
+   └─────────────────────────────────────────────────────────┘
+   ```
+
+   [Additional threats...]
+   ```
+
+8. **Console summary** (also display to user):
    ```
    Threat Analysis Complete
    ========================
@@ -286,6 +351,7 @@ When executing this skill:
      .threatmodel/state/threats.json
      .threatmodel/state/attack-trees.json
      .threatmodel/state/risk-register.json
+     .threatmodel/reports/threat-report.md
 
    Next Steps:
      Run /tm-verify to check control implementations

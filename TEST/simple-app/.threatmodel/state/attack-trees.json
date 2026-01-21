@@ -1,0 +1,164 @@
+{
+  "version": "1.0",
+  "generated": "2026-01-20T12:55:00Z",
+  "trees": [
+    {
+      "id": "at-001",
+      "threat_id": "threat-001",
+      "goal": "Gain unauthorized access via credential stuffing",
+      "root": {
+        "description": "Account Takeover via Credential Stuffing",
+        "type": "and",
+        "children": [
+          {
+            "description": "Obtain leaked credentials",
+            "type": "or",
+            "children": [
+              {"description": "Purchase from dark web", "type": "leaf", "difficulty": "low", "cost": "low"},
+              {"description": "Find in public breach dumps", "type": "leaf", "difficulty": "low", "cost": "none"},
+              {"description": "Use credential harvesting tools", "type": "leaf", "difficulty": "medium", "cost": "low"}
+            ]
+          },
+          {
+            "description": "Bypass rate limiting",
+            "type": "or",
+            "children": [
+              {"description": "Distribute attacks across IPs", "type": "leaf", "difficulty": "low", "cost": "low"},
+              {"description": "Slow and low attack pattern", "type": "leaf", "difficulty": "low", "cost": "none"},
+              {"description": "Use residential proxy network", "type": "leaf", "difficulty": "medium", "cost": "medium"}
+            ]
+          },
+          {
+            "description": "Successfully authenticate",
+            "type": "leaf",
+            "difficulty": "low",
+            "cost": "none"
+          }
+        ]
+      }
+    },
+    {
+      "id": "at-002",
+      "threat_id": "threat-003",
+      "goal": "Access other users' tasks via BOLA",
+      "root": {
+        "description": "Unauthorized Task Modification",
+        "type": "and",
+        "children": [
+          {
+            "description": "Obtain valid JWT token",
+            "type": "or",
+            "children": [
+              {"description": "Register legitimate account", "type": "leaf", "difficulty": "trivial", "cost": "none"},
+              {"description": "Steal existing user's token", "type": "leaf", "difficulty": "medium", "cost": "none"}
+            ]
+          },
+          {
+            "description": "Discover target task IDs",
+            "type": "or",
+            "children": [
+              {"description": "Enumerate sequential IDs", "type": "leaf", "difficulty": "low", "cost": "none"},
+              {"description": "Observe IDs in shared contexts", "type": "leaf", "difficulty": "low", "cost": "none"},
+              {"description": "Brute force ID space", "type": "leaf", "difficulty": "medium", "cost": "low"}
+            ]
+          },
+          {
+            "description": "Modify/Delete target task",
+            "type": "leaf",
+            "difficulty": "trivial",
+            "cost": "none"
+          }
+        ]
+      }
+    },
+    {
+      "id": "at-003",
+      "threat_id": "threat-013",
+      "goal": "Account takeover without MFA",
+      "root": {
+        "description": "Single-Factor Account Compromise",
+        "type": "and",
+        "children": [
+          {
+            "description": "Obtain user password",
+            "type": "or",
+            "children": [
+              {"description": "Phishing attack", "type": "leaf", "difficulty": "medium", "cost": "low"},
+              {"description": "Password from breach", "type": "leaf", "difficulty": "low", "cost": "none"},
+              {"description": "Social engineering", "type": "leaf", "difficulty": "medium", "cost": "none"},
+              {"description": "Brute force weak password", "type": "leaf", "difficulty": "medium", "cost": "low"},
+              {"description": "Shoulder surfing", "type": "leaf", "difficulty": "medium", "cost": "none"}
+            ]
+          },
+          {
+            "description": "Login with stolen password",
+            "type": "leaf",
+            "difficulty": "trivial",
+            "cost": "none",
+            "note": "No MFA blocks this step"
+          }
+        ]
+      }
+    },
+    {
+      "id": "at-004",
+      "threat_id": "threat-006",
+      "goal": "Steal JWT token via XSS",
+      "root": {
+        "description": "Token Theft via Cross-Site Scripting",
+        "type": "and",
+        "children": [
+          {
+            "description": "Inject malicious script",
+            "type": "or",
+            "children": [
+              {"description": "Stored XSS in task fields", "type": "leaf", "difficulty": "medium", "cost": "none"},
+              {"description": "Reflected XSS via URL params", "type": "leaf", "difficulty": "medium", "cost": "none"},
+              {"description": "DOM-based XSS", "type": "leaf", "difficulty": "medium", "cost": "none"}
+            ]
+          },
+          {
+            "description": "Extract token from storage",
+            "type": "leaf",
+            "difficulty": "trivial",
+            "cost": "none",
+            "note": "document.cookie or localStorage access"
+          },
+          {
+            "description": "Exfiltrate to attacker server",
+            "type": "leaf",
+            "difficulty": "trivial",
+            "cost": "low"
+          }
+        ]
+      }
+    },
+    {
+      "id": "at-005",
+      "threat_id": "threat-002",
+      "goal": "Flood password reset endpoint",
+      "root": {
+        "description": "Password Reset Denial of Service",
+        "type": "and",
+        "children": [
+          {
+            "description": "Gather target email addresses",
+            "type": "or",
+            "children": [
+              {"description": "Use enumeration vulnerability", "type": "leaf", "difficulty": "low", "cost": "none"},
+              {"description": "Guess common email patterns", "type": "leaf", "difficulty": "low", "cost": "none"},
+              {"description": "Obtain from OSINT", "type": "leaf", "difficulty": "low", "cost": "none"}
+            ]
+          },
+          {
+            "description": "Send mass reset requests",
+            "type": "leaf",
+            "difficulty": "trivial",
+            "cost": "none",
+            "note": "No rate limiting on endpoint"
+          }
+        ]
+      }
+    }
+  ]
+}

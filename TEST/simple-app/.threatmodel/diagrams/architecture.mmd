@@ -1,0 +1,25 @@
+graph TB
+    subgraph "Public Internet"
+        USER[("User")]
+        REACT["React Frontend<br/>(Vercel)"]
+    end
+
+    subgraph "Internal Network (Railway)"
+        API["Express API<br/>(Node.js)"]
+        DB[("PostgreSQL<br/>Database")]
+    end
+
+    subgraph "External Services"
+        SENDGRID["SendGrid<br/>(Email)"]
+    end
+
+    USER -->|"HTTPS"| REACT
+    REACT -->|"HTTPS REST API"| API
+    API -->|"PostgreSQL/TLS"| DB
+    API -->|"HTTPS API"| SENDGRID
+
+    style USER fill:#e1f5fe
+    style REACT fill:#fff3e0
+    style API fill:#e8f5e9
+    style DB fill:#fce4ec
+    style SENDGRID fill:#f3e5f5

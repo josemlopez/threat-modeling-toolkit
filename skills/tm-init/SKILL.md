@@ -233,7 +233,41 @@ When executing this skill:
    - Every external-facing component should be in attack surface
    - Trust boundaries should be identified
 
-6. **Report summary**:
+6. **Write visual discovery report** (`.threatmodel/reports/discovery-report.md`):
+   ```markdown
+   # Discovery Report
+
+   **Project**: [Name]
+   **Generated**: [Date]
+
+   ## System Overview
+
+   ```
+   DISCOVERY SUMMARY
+   ═══════════════════════════════════════════════════════════
+
+   ASSETS DISCOVERED: 14
+   ─────────────────────────────────────────────────────────
+   Services      │████████████████░░░░░░░░░░░░░░░░░░░░░░░░│  4
+   Data Stores   │████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  3
+   Clients       │████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  2
+   Integrations  │████████████████████░░░░░░░░░░░░░░░░░░░░│  5
+
+   DATA FLOWS: 22 (8 cross trust boundaries)
+   TRUST BOUNDARIES: 5
+   ATTACK SURFACE ENTRIES: 12
+   ```
+
+   ## Assets by Classification
+
+   | Asset | Type | Classification |
+   |-------|------|----------------|
+   | User Database | data-store | Restricted |
+   | API Gateway | service | Internal |
+   ...
+   ```
+
+7. **Console summary** (also display to user):
    ```
    Threat Model Initialized
    ========================
@@ -253,6 +287,7 @@ When executing this skill:
      .threatmodel/state/dataflows.json
      .threatmodel/state/trust-boundaries.json
      .threatmodel/state/attack-surface.json
+     .threatmodel/reports/discovery-report.md
      .threatmodel/diagrams/architecture.mmd
      .threatmodel/diagrams/dataflow.mmd
 

@@ -1,0 +1,25 @@
+project:
+  name: "TaskFlow"
+  version: "1.0.0"
+  description: "Simple task management application for small teams"
+
+analysis:
+  framework: "stride"
+  depth: "standard"
+
+documentation:
+  paths:
+    - "./docs"
+  patterns:
+    - "**/*.md"
+
+verification:
+  code_paths:
+    - "./src"
+  exclude_paths:
+    - "./node_modules"
+    - "./**/*.test.*"
+
+compliance:
+  frameworks:
+    - owasp

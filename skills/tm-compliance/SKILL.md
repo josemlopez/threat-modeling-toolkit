@@ -125,37 +125,85 @@ Map your threat model to compliance frameworks to:
 }
 ```
 
-### compliance-report.md
+### compliance-report.md (Visual Report)
 ```markdown
 # Compliance Report
 
+**Generated**: [Date]
+**Frameworks**: OWASP Top 10 2021, SOC2
+
 ## Executive Summary
-Overall compliance across frameworks:
-- OWASP Top 10: 82%
-- SOC2: 88%
+
+```
+COMPLIANCE OVERVIEW
+═══════════════════════════════════════════════════════════
+
+OWASP Top 10 2021
+─────────────────────────────────────────────────────────
+A01 Broken Access Control:     ████████░░ 85%   (1 gap)
+A02 Cryptographic Failures:    ██████████ 100%
+A03 Injection:                 ███████░░░ 70%   (3 gaps)
+A04 Insecure Design:           ██████░░░░ 55%   (5 gaps)
+A05 Security Misconfiguration: █████████░ 95%   (1 gap)
+A06 Vulnerable Components:     █████████░ 90%   (1 gap)
+A07 Auth Failures:             ████████░░ 75%   (4 gaps)
+A08 Data Integrity Failures:   ████████░░ 85%   (2 gaps)
+A09 Logging Failures:          ████████░░ 80%   (2 gaps)
+A10 SSRF:                      ██████████ 100%
+─────────────────────────────────────────────────────────
+OVERALL:                       ████████░░ 82%
+
+SOC2 Trust Services
+─────────────────────────────────────────────────────────
+CC6.1 Logical Access:          █████████░ 90%   (1 gap)
+CC6.2 Authentication:          ████████░░ 80%   (2 gaps)
+CC6.3 Access Restriction:      █████████░ 95%   (1 gap)
+─────────────────────────────────────────────────────────
+OVERALL:                       █████████░ 88%
+```
 
 ## OWASP Top 10 2021
 
 ### A01:2021 - Broken Access Control
-**Status**: Partial (85%)
 
-**Related Threats**:
-- THREAT-010: IDOR in user profile
-- THREAT-011: Missing function-level access control
-
-**Controls**:
-- [✓] RBAC implementation
-- [⚠] Object-level authorization (partial)
-
-**Gaps**:
-- GAP-005: Missing object-level checks
-
-**Evidence**:
-- RBAC: src/middleware/authorize.ts:15-89
+```
+┌─────────────────────────────────────────────────────────┐
+│ STATUS: ⚠ Partial (85%)                                 │
+├─────────────────────────────────────────────────────────┤
+│ RELATED THREATS:                                        │
+│   • THREAT-010: IDOR in user profile                    │
+│   • THREAT-011: Missing function-level access control   │
+│                                                         │
+│ CONTROLS:                                               │
+│   ✓ RBAC implementation                                 │
+│   ⚠ Object-level authorization (partial)               │
+│                                                         │
+│ GAPS:                                                   │
+│   • GAP-005: Missing object-level checks                │
+│                                                         │
+│ EVIDENCE:                                               │
+│   src/middleware/authorize.ts:15-89                     │
+└─────────────────────────────────────────────────────────┘
+```
 
 ### A02:2021 - Cryptographic Failures
-**Status**: Compliant (100%)
-...
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ STATUS: ✓ Compliant (100%)                              │
+├─────────────────────────────────────────────────────────┤
+│ CONTROLS:                                               │
+│   ✓ TLS 1.3 enforced                                    │
+│   ✓ AES-256 encryption at rest                          │
+│   ✓ Bcrypt password hashing                             │
+│                                                         │
+│ EVIDENCE:                                               │
+│   src/config/tls.ts:5                                   │
+│   src/db/encryption.ts:12                               │
+└─────────────────────────────────────────────────────────┘
+```
+
+[Additional requirements...]
 ```
 
 ## STRIDE to Framework Mapping
@@ -204,11 +252,16 @@ When executing this skill:
    - Per-framework percentage
    - Overall score
 
-5. **Generate reports**:
+5. **Generate reports with visuals IN THE FILES**:
    - JSON for programmatic use
-   - Markdown for human review
+   - Markdown with ASCII progress bars, status boxes, and visual indicators
+   - The compliance-report.md MUST include:
+     - Visual progress bars: `████████░░ 85%`
+     - Status indicators: `✓`, `⚠`, `✗`
+     - Visual box frames for each requirement
+   - These visuals go in the written file, not just console output
 
-6. **Report summary**:
+6. **Console summary** (also display to user):
    ```
    Compliance Mapping Complete
    ===========================
