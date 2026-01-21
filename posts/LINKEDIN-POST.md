@@ -92,7 +92,8 @@ OWASP Top 10 2021:
 **𝗜𝗻𝘀𝘁𝗮𝗹𝗹:**
 
 ```
-/install github:josemlopez/threat-modeling-toolkit
+/plugin marketplace add josemlopez/threat-modeling-toolkit
+/plugin install threat-modeling-toolkit@josemlopez
 ```
 
 **𝗨𝘀𝗲:**

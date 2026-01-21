@@ -160,10 +160,11 @@ Real output:
 
 ## Tweet 13 (Install)
 
-Install it:
+Install it in Claude Code:
 
 ```
-/install github:josemlopez/threat-modeling-toolkit
+/plugin marketplace add josemlopez/threat-modeling-toolkit
+/plugin install threat-modeling-toolkit@josemlopez
 ```
 
 Repo: https://github.com/josemlopez/threat-modeling-toolkit

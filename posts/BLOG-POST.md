@@ -313,8 +313,11 @@ CONTROL STATUS
 
 ## Installation
 
-```bash
-/install github:josemlopez/threat-modeling-toolkit
+In Claude Code, run:
+
+```
+/plugin marketplace add josemlopez/threat-modeling-toolkit
+/plugin install threat-modeling-toolkit@josemlopez
 ```
 
 That's it. All 9 skills are available immediately.
