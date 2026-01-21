@@ -326,29 +326,82 @@ When executing this skill:
 
 ### No Threat Model
 ```
-Threat Model Status
-===================
+═══════════════════════════════════════════════════════════════
+                    THREAT MODEL STATUS
+═══════════════════════════════════════════════════════════════
 
 No threat model found in current directory.
 
-To initialize a threat model, run:
+───────────────────────────────────────────────────────────────
+                     GETTING STARTED
+───────────────────────────────────────────────────────────────
+
+OPTION 1: Run everything at once (recommended)
+
+  /tm-full --docs ./path/to/docs
+
+OPTION 2: Run step by step
+
+  1. /tm-init --docs ./path/to/docs    Initialize & discover assets
+  2. /tm-threats                        Analyze threats (STRIDE)
+  3. /tm-verify                         Check controls in code
+  4. /tm-compliance --framework owasp   Map to compliance frameworks
+  5. /tm-report                         Generate reports
+
+───────────────────────────────────────────────────────────────
+                     WHAT IS --docs?
+───────────────────────────────────────────────────────────────
+
+Point --docs to a folder containing your architecture documentation:
+
+  - README.md with system overview
+  - Architecture diagrams or descriptions
+  - API specifications (OpenAPI, GraphQL schemas)
+  - Infrastructure-as-code (Terraform, CloudFormation)
+  - Database schemas
+  - Any markdown files describing your system
+
+Examples:
   /tm-init --docs ./docs
+  /tm-init --docs ./architecture
+  /tm-init --docs ./design
+
+The toolkit will read these files to understand your system
+and automatically discover assets, data flows, and trust boundaries.
+
+═══════════════════════════════════════════════════════════════
 ```
 
 ### Partial State
 ```
-Threat Model Status
-===================
+═══════════════════════════════════════════════════════════════
+                    THREAT MODEL STATUS
+═══════════════════════════════════════════════════════════════
 
-Warning: Incomplete threat model state
+Warning: Incomplete threat model
 
-Missing:
-  - threats.json (run /tm-threats)
-  - controls.json (run /tm-verify)
+───────────────────────────────────────────────────────────────
+                        COMPLETED
+───────────────────────────────────────────────────────────────
+  ✓ assets.json: 14 assets
+  ✓ dataflows.json: 22 flows
 
-Available:
-  - assets.json: 14 assets
-  - dataflows.json: 22 flows
+───────────────────────────────────────────────────────────────
+                      NOT YET RUN
+───────────────────────────────────────────────────────────────
+  ✗ threats.json     → Run /tm-threats
+  ✗ controls.json    → Run /tm-verify
+  ✗ compliance.json  → Run /tm-compliance
 
-Run /tm-threats to complete threat analysis.
+───────────────────────────────────────────────────────────────
+                       NEXT STEP
+───────────────────────────────────────────────────────────────
+
+Run the next phase:
+  /tm-threats
+
+Or run everything remaining:
+  /tm-full --continue
+
+═══════════════════════════════════════════════════════════════
 ```
