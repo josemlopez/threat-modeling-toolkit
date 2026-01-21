@@ -10,29 +10,66 @@
   <strong>Threat modeling inside your developer tools. No new UI. No external platform.</strong>
 </p>
 
-<p align="center">
-  From quick security checks to comprehensive threat analysis—powered by Claude Code.
-</p>
+---
+
+## Installation
+
+```bash
+/install github:josemlopez/threat-modeling-toolkit
+```
+
+That's it. All 9 skills are now available in Claude Code.
 
 ---
 
-## Why This Exists
+## Quick Start: Try It in 2 Minutes
 
-**The problem:** Threat modeling has always lived outside the developer's world. Specialized tools, separate workflows, complex frameworks that don't speak developer. Most devs skip it entirely—not because they don't care about security, but because the tooling doesn't meet them where they work.
+The toolkit includes a test project you can analyze immediately.
 
-**The solution:** Slash commands in Claude Code—the same place you already write and review code.
+### Step 1: Clone and navigate to the test app
 
-**For developers:** `/tm-full --docs ./docs` and you're done. Claude reads your design, identifies threats, checks if your code has the right controls. No security background needed.
+```bash
+git clone https://github.com/josemlopez/threat-modeling-toolkit.git
+cd threat-modeling-toolkit/TEST/simple-app
+```
 
-**For security professionals:** Go as deep as you need. Complex trust boundaries, attack trees, STRIDE analysis, multiple compliance frameworks, control verification with file:line evidence.
+### Step 2: Run the full analysis
+
+```bash
+/tm-full --docs ./docs --compliance owasp,soc2
+```
+
+### Step 3: See the results
+
+```
+.threatmodel/
+├── state/
+│   ├── assets.json          # 5 assets discovered
+│   ├── threats.json         # 15 threats identified
+│   ├── controls.json        # 5 implemented, 7 missing
+│   └── gaps.json            # 10 security gaps
+├── diagrams/
+│   └── architecture.mmd     # Mermaid diagram
+└── reports/
+    ├── risk-report.md       # Full findings
+    └── compliance-report.md # OWASP 52%, SOC2 48%
+```
 
 ---
 
-## Real Example: TaskFlow App
+## Step-by-Step Tutorial
 
-Here's actual output from running the toolkit against a task management app (React + Express + PostgreSQL):
+Let's walk through each skill using the `TEST/simple-app` project (a React + Express + PostgreSQL task manager with intentional security gaps).
 
-### `/tm-init` — Discover Architecture
+### Step 1: Initialize the Threat Model
+
+```bash
+/tm-init --docs ./docs
+```
+
+**What it does:** Reads your architecture documentation and extracts assets, data flows, trust boundaries, and attack surface.
+
+**Output:**
 
 ```
 Threat Model Initialized
@@ -51,37 +88,28 @@ Created:
   .threatmodel/config.yaml
   .threatmodel/state/assets.json
   .threatmodel/state/dataflows.json
-  .threatmodel/state/trust-boundaries.json
-  .threatmodel/state/attack-surface.json
   .threatmodel/diagrams/architecture.mmd
-  .threatmodel/diagrams/dataflow.mmd
 
 Next Steps:
   Run /tm-threats to analyze threats
 ```
 
-**Assets discovered:**
-
-| ID | Name | Type | Classification |
-|----|------|------|----------------|
-| asset-001 | React Frontend | client | public |
-| asset-002 | Express API | service | internal |
-| asset-003 | PostgreSQL Database | data-store | restricted |
-| asset-004 | JWT Authentication | identity | confidential |
-| asset-005 | SendGrid Integration | integration | internal |
-
-**Attack surface with gaps already flagged:**
-
-| Endpoint | Auth | Gaps Found |
-|----------|------|------------|
-| POST /api/auth/login | none | - |
-| POST /api/auth/forgot-password | none | **No rate limiting** |
-| PUT /api/tasks/:id | jwt | **Missing BOLA check** |
-| DELETE /api/tasks/:id | jwt | **Missing BOLA check** |
+**Files created:**
+- `assets.json` — React Frontend, Express API, PostgreSQL, JWT Auth, SendGrid
+- `attack-surface.json` — All API endpoints with auth requirements
+- `architecture.mmd` — Mermaid diagram ready to render
 
 ---
 
-### `/tm-threats` — Analyze Threats
+### Step 2: Analyze Threats
+
+```bash
+/tm-threats
+```
+
+**What it does:** Applies STRIDE analysis to every asset and data flow. Generates attack trees for critical threats.
+
+**Output:**
 
 ```
 Threat Analysis Complete
@@ -89,14 +117,11 @@ Threat Analysis Complete
 
 Framework: STRIDE
 Assets Analyzed: 5
-Attack Surfaces Analyzed: 8
 
 Threats Identified:
   Critical: 4
   High:     7
   Medium:   4
-  Low:      0
-  ─────────
   Total:   15
 
 Top Critical Threats:
@@ -104,9 +129,6 @@ Top Critical Threats:
   2. [THREAT-003] BOLA - Task Update (Risk: 16)
   3. [THREAT-004] BOLA - Task Delete (Risk: 16)
   4. [THREAT-013] Missing MFA (Risk: 16)
-
-Attack Trees Generated: 5
-Risk Register Entries: 15
 
 Files Updated:
   .threatmodel/state/threats.json
@@ -117,54 +139,21 @@ Next Steps:
   Run /tm-verify to check control implementations
 ```
 
-**Critical threat with code reference:**
+**What you'll find in threats.json:**
 
-```
-THREAT-003: Broken Object-Level Authorization (BOLA) - Task Update
-──────────────────────────────────────────────────────────────────
-Category:     Elevation of Privilege
-Target:       PUT /api/tasks/:id
-Risk Score:   16 (Critical)
-MITRE ATT&CK: T1548
-CWE:          CWE-639, CWE-284
-
-Code Reference: src/routes/tasks.js:44
-┌─────────────────────────────────────────────────────────────────┐
-│ // BUG: Should check if user owns this task!                    │
-│ const result = await db.query(                                  │
-│   'UPDATE tasks SET ... WHERE id = $5',  // Missing user_id     │
-│   ...                                                           │
-│ );                                                              │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**Attack tree generated:**
-
-```
-                    ┌─────────────────────────────────┐
-                    │   Unauthorized Task             │
-                    │   Modification [AND]            │
-                    └───────────────┬─────────────────┘
-                                    │
-        ┌───────────────────────────┼───────────────────────────┐
-        ▼                           ▼                           ▼
-┌───────────────────┐   ┌───────────────────┐   ┌───────────────────┐
-│ Obtain Valid      │   │ Discover Target   │   │ Modify/Delete     │
-│ JWT Token [OR]    │   │ Task IDs [OR]     │   │ Target Task       │
-└────────┬──────────┘   └────────┬──────────┘   │ [LEAF]            │
-         │                       │              │ Difficulty: TRIVIAL│
-    ┌────┴────┐             ┌────┴────┐        └───────────────────┘
-    ▼         ▼             ▼         ▼
-┌───────┐ ┌───────┐   ┌───────┐ ┌───────┐
-│Register│ │Steal  │   │Enum   │ │Brute  │
-│Account│ │Token  │   │Seq IDs│ │Force  │
-│TRIVIAL│ │MEDIUM │   │LOW    │ │MEDIUM │
-└───────┘ └───────┘   └───────┘ └───────┘
-```
+Each threat includes category, target, risk score, MITRE ATT&CK mapping, CWE references, and recommended countermeasures.
 
 ---
 
-### `/tm-verify` — Check Code for Controls
+### Step 3: Verify Controls in Code
+
+```bash
+/tm-verify
+```
+
+**What it does:** Searches your codebase to verify security controls actually exist. Provides file:line evidence.
+
+**Output:**
 
 ```
 Control Verification Complete
@@ -181,8 +170,6 @@ Gaps Identified:
   Critical: 3
   High:     5
   Medium:   2
-  ──────────
-  Total:   10
 
 Files Updated:
   .threatmodel/state/controls.json
@@ -190,88 +177,89 @@ Files Updated:
 
 Next Steps:
   Run /tm-compliance to map to frameworks
-  Run /tm-report to generate risk report
 ```
 
-**Implemented controls found with evidence:**
+**Evidence found:**
 
 | Control | Status | Evidence |
 |---------|--------|----------|
 | Password Hashing | ✓ | `src/routes/auth.js:20` - bcrypt cost 10 |
 | JWT Authentication | ✓ | `src/middleware/auth.js:16` |
 | Rate Limiting (login) | ✓ | `src/middleware/rateLimiter.js:4-10` |
-| Parameterized SQL | ✓ | All queries use $1, $2 placeholders |
-| Secure Reset Token | ✓ | `src/routes/auth.js:76` - crypto.randomBytes(32) |
-
-**Missing controls with specific gaps:**
-
-| Gap | Severity | Issue | Fix |
-|-----|----------|-------|-----|
-| GAP-001 | Critical | PUT /tasks/:id lacks ownership check | Add `AND user_id = $N` |
-| GAP-002 | Critical | DELETE /tasks/:id lacks ownership check | Add `AND user_id = $N` |
-| GAP-003 | High | /forgot-password has no rate limiting | Add loginLimiter middleware |
-| GAP-004 | Critical | No MFA implementation | Implement TOTP |
-| GAP-006 | High | No security event logging | Add winston/pino |
+| BOLA Protection | ✗ | Missing in `src/routes/tasks.js:44` |
+| MFA | ✗ | Not found |
 
 ---
 
-### `/tm-compliance` — Map to Frameworks
+### Step 4: Map to Compliance Frameworks
+
+```bash
+/tm-compliance --framework owasp,soc2
+```
+
+**What it does:** Maps your threats and controls to OWASP Top 10, SOC2, PCI-DSS.
+
+**Output:**
 
 ```
 Compliance Mapping Complete
 ===========================
 
-Frameworks Analyzed: 2
-
 OWASP Top 10 2021:
   A01 Broken Access Control:     ██░░░░░░░░ 15%  (2 gaps) NON-COMPLIANT
   A02 Cryptographic Failures:    █████████░ 90%          COMPLIANT
   A03 Injection:                 ███████░░░ 70%  (1 gap) PARTIAL
-  A04 Insecure Design:           ░░░░░░░░░░  0%  (2 gaps) NON-COMPLIANT
-  A05 Security Misconfiguration: █████░░░░░ 50%  (1 gap) PARTIAL
   A07 Authentication Failures:   █████░░░░░ 45%  (3 gaps) PARTIAL
-  A08 Integrity Failures:        ░░░░░░░░░░  0%  (1 gap) NON-COMPLIANT
   A09 Logging Failures:          ░░░░░░░░░░  0%  (1 gap) NON-COMPLIANT
   ─────────────────────────────────────────────────────
   Overall: 52%
 
 SOC2 Trust Services:
-  CC6.1 Logical Access:          ████░░░░░░ 40%  (2 gaps) PARTIAL
-  CC6.2 Authentication:          ████░░░░░░ 35%  (3 gaps) PARTIAL
-  CC6.3 Access Restrictions:     ██░░░░░░░░ 20%  (2 gaps) NON-COMPLIANT
-  CC6.7 Transmission Integrity:  ██████████ 100%         COMPLIANT
+  CC6.1 Logical Access:          ████░░░░░░ 40%  PARTIAL
+  CC6.2 Authentication:          ████░░░░░░ 35%  PARTIAL
+  CC6.7 Transmission Integrity:  ██████████ 100% COMPLIANT
   ─────────────────────────────────────────────────────
   Overall: 48%
-
-Total Gaps Affecting Compliance: 10
-  Critical Priority: 3
-  High Priority: 5
-  Medium Priority: 2
 
 Files Created:
   .threatmodel/state/compliance.json
   .threatmodel/reports/compliance-report.md
-
-Next Steps:
-  Run /tm-report to generate full risk report
 ```
 
 ---
 
-### `/tm-tests` — Generate Security Tests
+### Step 5: Generate Reports
+
+```bash
+/tm-report
+```
+
+**What it does:** Creates markdown reports for stakeholders.
+
+**Files created:**
+- `risk-report.md` — Detailed findings with attack scenarios
+- `executive-summary.md` — 1-page overview for leadership
+
+---
+
+### Step 6: Generate Security Tests
+
+```bash
+/tm-tests --format jest
+```
+
+**What it does:** Creates test cases from identified threats.
+
+**Output:**
 
 ```
 Test Generation Complete
 ========================
 
-Format: jest
-
-Tests Generated:
+Tests Generated: 29
   Authentication: 10 tests
   Authorization: 8 tests
   Input Validation: 11 tests
-  ─────────────────────────
-  Total: 29 tests
 
 Expected Failures: 6 tests
   (Document known gaps - will pass after remediation)
@@ -279,31 +267,47 @@ Expected Failures: 6 tests
 Files Created:
   .threatmodel/tests/auth-security.test.js
   .threatmodel/tests/authz-security.test.js
-  .threatmodel/tests/input-validation.test.js
 ```
 
-**Sample generated test documenting a gap:**
+**Sample generated test:**
 
 ```javascript
 it('TEST-012: [EXPECTED FAIL] Should block user from updating others task', async () => {
-  // NOTE: This test documents GAP-001
-  // Currently NO ownership check - test should fail until fixed
-
+  // Documents GAP-001 - will pass after fix
   const response = await request(app)
     .put(`/api/tasks/${userATaskId}`)
     .set('Authorization', `Bearer ${userBToken}`)
     .send({ title: 'Hacked by User B' });
 
-  // Should return 403 Forbidden (FAILS until GAP-001 fixed)
   expect(response.status).toBe(403);
 });
 ```
 
-When the test starts passing, you know the gap is fixed.
+---
+
+### Step 7: Track Changes Over Time
+
+```bash
+/tm-drift --create-baseline
+```
+
+After code changes:
+
+```bash
+/tm-drift
+```
+
+**What it does:** Compares current state to baseline. Detects new components, removed controls, changed configurations.
 
 ---
 
-### `/tm-status` — Quick Overview
+### Step 8: Quick Status Check
+
+```bash
+/tm-status
+```
+
+**Output:**
 
 ```
 ═══════════════════════════════════════════════════════════════
@@ -312,25 +316,18 @@ When the test starts passing, you know the gap is fixed.
 
 Project: TaskFlow v1.0.0
 Framework: STRIDE
-Last Updated: 2026-01-20
 
 ───────────────────────────────────────────────────────────────
                         THREATS
 ───────────────────────────────────────────────────────────────
-
 Total: 15 threats
-
-By Severity:
   ├── Critical:  4  ██████████░░░░░░░░░░  27%
   ├── High:      7  ██████████████████░░  47%
-  ├── Medium:    4  ██████████░░░░░░░░░░  27%
-  └── Low:       0  ░░░░░░░░░░░░░░░░░░░░   0%
+  └── Medium:    4  ██████████░░░░░░░░░░  27%
 
 ───────────────────────────────────────────────────────────────
                        CONTROLS
 ───────────────────────────────────────────────────────────────
-
-Implementation Status:
   ├── Implemented: 5  █████████████░░░░░░░  33%
   ├── Partial:     3  ████████░░░░░░░░░░░░  20%
   └── Missing:     7  ██████████████████░░  47%
@@ -338,7 +335,6 @@ Implementation Status:
 ───────────────────────────────────────────────────────────────
                       COMPLIANCE
 ───────────────────────────────────────────────────────────────
-
 OWASP Top 10 2021:  52%  ██████░░░░
 SOC2 Trust Services: 48%  █████░░░░░
 
@@ -347,37 +343,13 @@ SOC2 Trust Services: 48%  █████░░░░░
 
 ---
 
-## What You Get
+## Or Just Run Everything at Once
 
-### Directory Structure
+```bash
+/tm-full --docs ./docs --compliance owasp,soc2
+```
 
-```
-.threatmodel/
-├── config.yaml                  # Configuration
-├── state/
-│   ├── assets.json              # Asset inventory
-│   ├── dataflows.json           # Data flow definitions
-│   ├── trust-boundaries.json    # Trust boundaries
-│   ├── attack-surface.json      # Entry points
-│   ├── threats.json             # Threat catalog
-│   ├── attack-trees.json        # Attack decomposition
-│   ├── controls.json            # Control inventory
-│   ├── gaps.json                # Security gaps
-│   ├── risk-register.json       # Risk prioritization
-│   └── compliance.json          # Framework mapping
-├── diagrams/
-│   ├── architecture.mmd         # Mermaid: system view
-│   ├── dataflow.mmd             # Mermaid: data flows
-│   └── trust-boundaries.mmd     # Mermaid: boundaries
-├── reports/
-│   ├── risk-report.md           # Detailed findings
-│   ├── executive-summary.md     # High-level summary
-│   └── compliance-report.md     # Framework coverage
-├── tests/
-│   └── *.test.js                # Generated test cases
-└── baseline/
-    └── snapshot-YYYYMMDD.json   # Historical snapshots
-```
+This runs all phases automatically: init → threats → verify → compliance → report.
 
 ---
 
@@ -397,59 +369,44 @@ SOC2 Trust Services: 48%  █████░░░░░
 
 ---
 
-## Quick Start
+## Test Projects Included
 
-```bash
-# Install
-/install github:josemlopez/threat-modeling-toolkit
+The `TEST/` directory contains two example projects:
 
-# Run full analysis
-/tm-full --docs ./docs --compliance owasp,soc2
-```
+| Project | Description | Use Case |
+|---------|-------------|----------|
+| `TEST/simple-app/` | React + Express task manager | Developer experience |
+| `TEST/complex-system/` | Enterprise financial platform | Security expert experience |
 
-Or run individual phases:
+Pre-generated results are in `TEST/results/` so you can see expected output.
 
-```bash
-/tm-init --docs ./docs              # Discover architecture
-/tm-threats --framework stride      # Analyze threats
-/tm-verify --thorough               # Check controls in code
-/tm-compliance --framework owasp    # Map to frameworks
-/tm-report --level detailed         # Generate reports
-/tm-status                          # Quick overview
-/tm-drift --create-baseline         # Track changes
-/tm-tests --format jest             # Generate tests
-```
+---
+
+## Why This Exists
+
+**The problem:** Threat modeling has always lived outside the developer's world. Specialized tools, separate workflows, complex frameworks that don't speak developer.
+
+**The solution:** Slash commands in Claude Code—the same place you already write and review code.
+
+**For developers:** `/tm-full --docs ./docs` and you're done. No security background needed.
+
+**For security professionals:** Go as deep as you need. Complex trust boundaries, attack trees, STRIDE analysis, multiple compliance frameworks, control verification with file:line evidence.
 
 ---
 
 ## What Makes This Different
 
-### 1. Code-Connected
+### Code-Connected
+Every control has evidence. Every gap has a file path. Not assumptions—verification.
 
-Traditional threat models describe what *should* exist. This one verifies what *does* exist. Every control has evidence. Every gap has a file path.
+### Living Document
+Drift detection keeps your threat model current as code changes.
 
-### 2. Living Document
+### Compliance-Ready
+Traceable evidence: Requirement → Threat → Control → Code Location → Test.
 
-Drift detection means your threat model stays current. New component added? It gets flagged. Control removed? You'll know.
-
-### 3. Compliance-Ready
-
-Auditors want traceability. This provides it: Requirement → Threat → Control → Code Location → Test.
-
-### 4. Actionable Output
-
-Not just a list of threats—prioritized risks with specific countermeasures, effort estimates, and test cases.
-
----
-
-## Try the Test Cases
-
-The `TEST/` directory contains two example projects:
-
-- **`TEST/simple-app/`** — Developer experience (React + Express task app)
-- **`TEST/complex-system/`** — Security expert experience (enterprise financial platform)
-
-Results from running all skills are in `TEST/results/`.
+### Actionable Output
+Prioritized risks with specific countermeasures, effort estimates, and test cases.
 
 ---
 
