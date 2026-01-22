@@ -10,6 +10,10 @@
   <strong>Threat modeling inside your developer tools. No new UI. No external platform.</strong>
 </p>
 
+<p align="center">
+  <img src="resources/image.png" alt="Threat Modeling Toolkit overview" width="900" />
+</p>
+
 ---
 
 ## Installation
